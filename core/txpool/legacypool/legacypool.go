@@ -1012,6 +1012,8 @@ func (pool *LegacyPool) addRemoteSync(tx *types.Transaction) error {
 // If sync is set, the method will block until all internal maintenance related
 // to the add is finished. Only use this during tests for determinism!
 func (pool *LegacyPool) Add(txs []*types.Transaction, local, sync bool) []error {
+	log.Info("=== Add ===", "txs", txs, "local", local, "sync", sync)
+
 	// Do not treat as local if local transactions have been disabled
 	local = local && !pool.config.NoLocals
 
