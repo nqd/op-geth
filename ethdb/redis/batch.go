@@ -22,6 +22,8 @@ type batch struct {
 
 // Delete implements ethdb.Batch.
 func (b *batch) Delete(key []byte) error {
+	b.db.batchDelete.Add(1)
+
 	b.writes = append(b.writes, keyvalue{string(key), nil, true})
 	b.size += len(key)
 
@@ -30,6 +32,8 @@ func (b *batch) Delete(key []byte) error {
 
 // Put implements ethdb.Batch.
 func (b *batch) Put(key []byte, value []byte) error {
+	b.db.batchPut.Add(1)
+
 	b.writes = append(b.writes, keyvalue{string(key), common.CopyBytes(value), false})
 	b.size += len(key) + len(value)
 
@@ -38,6 +42,8 @@ func (b *batch) Put(key []byte, value []byte) error {
 
 // Replay implements ethdb.Batch.
 func (b *batch) Replay(w ethdb.KeyValueWriter) error {
+	b.db.batchReplay.Add(1)
+
 	for _, kv := range b.writes {
 		if kv.delete {
 			if err := w.Delete([]byte(kv.key)); err != nil {
@@ -56,17 +62,23 @@ func (b *batch) Replay(w ethdb.KeyValueWriter) error {
 
 // Reset implements ethdb.Batch.
 func (b *batch) Reset() {
+	b.db.batchReset.Add(1)
+
 	b.writes = b.writes[:0]
 	b.size = 0
 }
 
 // ValueSize implements ethdb.Batch.
 func (b *batch) ValueSize() int {
+	b.db.batchValueSize.Add(1)
+
 	return b.size
 }
 
 // Write implements ethdb.Batch.
 func (b *batch) Write() error {
+	b.db.batchWrite.Add(1)
+
 	ctx := context.Background()
 
 	_, err := b.db.client.Pipelined(ctx, func(pipe redis.Pipeliner) error {

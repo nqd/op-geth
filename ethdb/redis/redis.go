@@ -17,19 +17,35 @@ import (
 type Database struct {
 	client *redis.ClusterClient
 
-	deleteCountMeter   metrics.Meter
-	getCountMeter      metrics.Meter
-	hasCountMeter      metrics.Meter
-	putCountMeter      metrics.Meter
-	batchCountMeter    metrics.Meter
+	deleteCountMeter metrics.Meter
+	getCountMeter    metrics.Meter
+	hasCountMeter    metrics.Meter
+	putCountMeter    metrics.Meter
+
+	batchCountMeter          metrics.Meter
+	batchDeleteCountMeter    metrics.Meter
+	batchPutCountMeter       metrics.Meter
+	batchReplayCountMeter    metrics.Meter
+	batchResetCountMeter     metrics.Meter
+	batchWriteCountMeter     metrics.Meter
+	batchValueSizeCountMeter metrics.Meter
+
 	batchWithSizeMeter metrics.Meter
 	iteratorCountMeter metrics.Meter
 
-	deleteCount        atomic.Int64 // Total number of delete operations
-	getCount           atomic.Int64 // Total number of get operations
-	hasCount           atomic.Int64 // Total number of has operations
-	putCount           atomic.Int64 // Total number of put operations
-	batchCount         atomic.Int64 // Total number of new batch operations
+	deleteCount atomic.Int64 // Total number of delete operations
+	getCount    atomic.Int64 // Total number of get operations
+	hasCount    atomic.Int64 // Total number of has operations
+	putCount    atomic.Int64 // Total number of put operations
+	batchCount  atomic.Int64 // Total number of new batch operations
+
+	batchDelete    atomic.Int64 // Total number of new batch.delete operations
+	batchPut       atomic.Int64 // Total number of new batch.put operations
+	batchReplay    atomic.Int64 // Total number of new batch.replay operations
+	batchReset     atomic.Int64 // Total number of new batch.reset operations
+	batchWrite     atomic.Int64 // Total number of new batch.write operations
+	batchValueSize atomic.Int64 // Total number of new batch.valueSize operations
+
 	batchWithSizeCount atomic.Int64 // Total number of new batch with size operations
 	iteratorCount      atomic.Int64 // Total number of new iterator operations
 }
@@ -49,7 +65,15 @@ func New(client *redis.ClusterClient, namespace string) *Database {
 	db.getCountMeter = metrics.GetOrRegisterMeter(namespace+"getcount", nil)
 	db.hasCountMeter = metrics.GetOrRegisterMeter(namespace+"hascount", nil)
 	db.putCountMeter = metrics.GetOrRegisterMeter(namespace+"putcount", nil)
+
 	db.batchCountMeter = metrics.GetOrRegisterMeter(namespace+"batchcount", nil)
+	db.batchDeleteCountMeter = metrics.GetOrRegisterMeter(namespace+"batchdeletecount", nil)
+	db.batchPutCountMeter = metrics.GetOrRegisterMeter(namespace+"batchputcount", nil)
+	db.batchReplayCountMeter = metrics.GetOrRegisterMeter(namespace+"batchreplaycount", nil)
+	db.batchResetCountMeter = metrics.GetOrRegisterMeter(namespace+"batchresetcount", nil)
+	db.batchWriteCountMeter = metrics.GetOrRegisterMeter(namespace+"batchwritecount", nil)
+	db.batchValueSizeCountMeter = metrics.GetOrRegisterMeter(namespace+"batchvaluesizecount", nil)
+
 	db.batchWithSizeMeter = metrics.GetOrRegisterMeter(namespace+"batchwithsizecount", nil)
 	db.iteratorCountMeter = metrics.GetOrRegisterMeter(namespace+"iteratorcount", nil)
 
@@ -236,7 +260,15 @@ func (d *Database) meter(refresh time.Duration) {
 		d.getCountMeter.Mark(d.getCount.Swap(0))
 		d.hasCountMeter.Mark(d.hasCount.Swap(0))
 		d.putCountMeter.Mark(d.putCount.Swap(0))
+
 		d.batchCountMeter.Mark(d.batchCount.Swap(0))
+		d.batchDeleteCountMeter.Mark(d.batchDelete.Swap(0))
+		d.batchPutCountMeter.Mark(d.batchPut.Swap(0))
+		d.batchReplayCountMeter.Mark(d.batchReplay.Swap(0))
+		d.batchResetCountMeter.Mark(d.batchReset.Swap(0))
+		d.batchWriteCountMeter.Mark(d.batchWrite.Swap(0))
+		d.batchValueSizeCountMeter.Mark(d.batchValueSize.Swap(0))
+
 		d.batchWithSizeMeter.Mark(d.batchWithSizeCount.Swap(0))
 		d.iteratorCountMeter.Mark(d.iteratorCount.Swap(0))
 	}
