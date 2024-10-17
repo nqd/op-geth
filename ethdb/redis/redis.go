@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/ethdb"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
 	"github.com/redis/go-redis/v9"
 )
@@ -32,6 +33,7 @@ type Database struct {
 
 	batchWithSizeMeter metrics.Meter
 	iteratorCountMeter metrics.Meter
+	iteratorSetupMeter metrics.Meter
 
 	deleteCount atomic.Int64 // Total number of delete operations
 	getCount    atomic.Int64 // Total number of get operations
@@ -76,6 +78,7 @@ func New(client *redis.ClusterClient, namespace string) *Database {
 
 	db.batchWithSizeMeter = metrics.GetOrRegisterMeter(namespace+"batchwithsizecount", nil)
 	db.iteratorCountMeter = metrics.GetOrRegisterMeter(namespace+"iteratorcount", nil)
+	db.iteratorSetupMeter = metrics.GetOrRegisterMeter(namespace+"iteratorsetup", nil)
 
 	go db.meter(metricsGatheringInterval)
 
@@ -164,6 +167,15 @@ func (d *Database) NewBatchWithSize(size int) ethdb.Batch {
 
 // NewIterator implements ethdb.KeyValueStore.
 func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+	t1 := time.Now()
+	defer func() {
+		du := time.Since(t1)
+
+		log.Info("NewIterator setup", "durationInSec", du.Seconds())
+
+		d.iteratorSetupMeter.Mark(int64(du))
+	}()
+
 	d.iteratorCount.Add(1)
 
 	ctx := context.Background()
