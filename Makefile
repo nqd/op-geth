@@ -61,3 +61,7 @@ help: Makefile
 	@echo ''
 	@echo 'Targets:'
 	@sed -n 's/^#?//p' $< | column -t -s ':' |  sort | sed -e 's/^/ /'
+
+.PHONY: gen_proto
+gen_proto:
+	@ buf generate protos --template ethdb/rpcdb/proto/buf.gen.yaml

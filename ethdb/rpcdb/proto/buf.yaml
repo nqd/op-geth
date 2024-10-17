@@ -1,0 +1,12 @@
+version: v1
+name: buf.cbhq.net/ethereum/rpcdb
+deps:
+  - buf.build/googleapis/googleapis
+breaking:
+  use:
+    - PACKAGE
+lint:
+  use:
+    - DEFAULT
+  except:
+    - PACKAGE_VERSION_SUFFIX
