@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ethereum.rpcdb.api.v1;
 
-option go_package = "ithub.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1";
+option go_package = "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1";
 
 service KV {
   rpc Get(GetRequest) returns (GetResponse) {}
