@@ -217,6 +217,8 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 		return strings.Compare(a.key, b.key)
 	})
 
+	log.Info("NewIterator get key", "rawSize", len(iter.kvs), "durationInSec", time.Since(t1).Seconds())
+
 	// query values via pipeline
 	cmds, err := d.client.Pipelined(ctx, func(pipe redis.Pipeliner) error {
 		for i := range iter.kvs {
