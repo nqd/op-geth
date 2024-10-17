@@ -64,4 +64,4 @@ help: Makefile
 
 .PHONY: gen_proto
 gen_proto:
-	@ buf generate protos --template ethdb/rpcdb/proto/buf.gen.yaml
+	@ buf generate ethdb/rpcdb/proto --template ethdb/rpcdb/proto/buf.gen.yaml
