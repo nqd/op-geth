@@ -8,11 +8,16 @@ service KV {
   rpc Get(GetRequest) returns (GetResponse) {}
   rpc Batch(BatchRequest) returns (BatchResponse) {}
   rpc NewIterator(NewIteratorRequest) returns (NewIteratorResponse) {}
+  rpc Compact(CompactRequest) returns (CompactResponse) {}
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+  rpc Put(PutRequest) returns (PutResponse) {}
+  rpc Reset(ResetRequest) returns (ResetResponse) {}
 
   rpc IteratorError(IteratorErrorRequest) returns (IteratorErrorResponse) {}
   rpc IteratorKey(IteratorKeyRequest) returns (IteratorKeyResponse) {}
   rpc IteratorNext(IteratorNextRequest) returns (IteratorNextResponse) {}
-  rpc IteratorRelease(IteratorReleaseRequest) returns (IteratorReleaseResponse) {}
+  rpc IteratorRelease(IteratorReleaseRequest) returns 
+    (IteratorReleaseResponse) {}
   rpc IteratorValue(IteratorValueRequest) returns (IteratorValueResponse) {}
 }
 
@@ -85,4 +90,33 @@ message IteratorValueRequest {
 
 message IteratorValueResponse {
   bytes value = 1;
+}
+
+message CompactRequest {
+  bytes start = 1;
+  bytes limit = 2;
+}
+
+message CompactResponse {
+}
+
+message DeleteRequest {
+  bytes key = 1;
+}
+
+message DeleteResponse {
+}
+
+message PutRequest {
+  bytes key = 1;
+  bytes value = 2;
+}
+
+message PutResponse {
+}
+
+message ResetRequest {
+}
+
+message ResetResponse {
 }

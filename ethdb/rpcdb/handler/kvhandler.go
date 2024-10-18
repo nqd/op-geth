@@ -83,3 +83,13 @@ func (s *kvStore) NewIterator(_ context.Context, req *api.NewIteratorRequest) (*
 
 	return &api.NewIteratorResponse{IteratorId: id}, nil
 }
+
+func (s *kvStore) Compact(_ context.Context, req *api.CompactRequest) (*api.CompactResponse, error) {
+	start := req.GetStart()
+	limit := req.GetLimit()
+	if err := s.pebbleDB.Compact(start, limit); err != nil {
+		return nil, err
+	}
+
+	return &api.CompactResponse{}, nil
+}
