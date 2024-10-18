@@ -22,6 +22,10 @@ const (
 	KV_Get_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Get"
 	KV_Batch_FullMethodName           = "/ethereum.rpcdb.api.v1.KV/Batch"
 	KV_NewIterator_FullMethodName     = "/ethereum.rpcdb.api.v1.KV/NewIterator"
+	KV_Compact_FullMethodName         = "/ethereum.rpcdb.api.v1.KV/Compact"
+	KV_Delete_FullMethodName          = "/ethereum.rpcdb.api.v1.KV/Delete"
+	KV_Put_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Put"
+	KV_Reset_FullMethodName           = "/ethereum.rpcdb.api.v1.KV/Reset"
 	KV_IteratorError_FullMethodName   = "/ethereum.rpcdb.api.v1.KV/IteratorError"
 	KV_IteratorKey_FullMethodName     = "/ethereum.rpcdb.api.v1.KV/IteratorKey"
 	KV_IteratorNext_FullMethodName    = "/ethereum.rpcdb.api.v1.KV/IteratorNext"
@@ -36,6 +40,10 @@ type KVClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	Batch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*BatchResponse, error)
 	NewIterator(ctx context.Context, in *NewIteratorRequest, opts ...grpc.CallOption) (*NewIteratorResponse, error)
+	Compact(ctx context.Context, in *CompactRequest, opts ...grpc.CallOption) (*CompactResponse, error)
+	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error)
+	Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
 	IteratorError(ctx context.Context, in *IteratorErrorRequest, opts ...grpc.CallOption) (*IteratorErrorResponse, error)
 	IteratorKey(ctx context.Context, in *IteratorKeyRequest, opts ...grpc.CallOption) (*IteratorKeyResponse, error)
 	IteratorNext(ctx context.Context, in *IteratorNextRequest, opts ...grpc.CallOption) (*IteratorNextResponse, error)
@@ -75,6 +83,46 @@ func (c *kVClient) NewIterator(ctx context.Context, in *NewIteratorRequest, opts
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(NewIteratorResponse)
 	err := c.cc.Invoke(ctx, KV_NewIterator_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kVClient) Compact(ctx context.Context, in *CompactRequest, opts ...grpc.CallOption) (*CompactResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CompactResponse)
+	err := c.cc.Invoke(ctx, KV_Compact_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kVClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, KV_Delete_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kVClient) Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PutResponse)
+	err := c.cc.Invoke(ctx, KV_Put_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kVClient) Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResetResponse)
+	err := c.cc.Invoke(ctx, KV_Reset_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +186,10 @@ type KVServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	Batch(context.Context, *BatchRequest) (*BatchResponse, error)
 	NewIterator(context.Context, *NewIteratorRequest) (*NewIteratorResponse, error)
+	Compact(context.Context, *CompactRequest) (*CompactResponse, error)
+	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	Put(context.Context, *PutRequest) (*PutResponse, error)
+	Reset(context.Context, *ResetRequest) (*ResetResponse, error)
 	IteratorError(context.Context, *IteratorErrorRequest) (*IteratorErrorResponse, error)
 	IteratorKey(context.Context, *IteratorKeyRequest) (*IteratorKeyResponse, error)
 	IteratorNext(context.Context, *IteratorNextRequest) (*IteratorNextResponse, error)
@@ -161,6 +213,18 @@ func (UnimplementedKVServer) Batch(context.Context, *BatchRequest) (*BatchRespon
 }
 func (UnimplementedKVServer) NewIterator(context.Context, *NewIteratorRequest) (*NewIteratorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewIterator not implemented")
+}
+func (UnimplementedKVServer) Compact(context.Context, *CompactRequest) (*CompactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Compact not implemented")
+}
+func (UnimplementedKVServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedKVServer) Put(context.Context, *PutRequest) (*PutResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Put not implemented")
+}
+func (UnimplementedKVServer) Reset(context.Context, *ResetRequest) (*ResetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Reset not implemented")
 }
 func (UnimplementedKVServer) IteratorError(context.Context, *IteratorErrorRequest) (*IteratorErrorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IteratorError not implemented")
@@ -248,6 +312,78 @@ func _KV_NewIterator_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KVServer).NewIterator(ctx, req.(*NewIteratorRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KV_Compact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CompactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KVServer).Compact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KV_Compact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KVServer).Compact(ctx, req.(*CompactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KV_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KVServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KV_Delete_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KVServer).Delete(ctx, req.(*DeleteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KV_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KVServer).Put(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KV_Put_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KVServer).Put(ctx, req.(*PutRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KV_Reset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KVServer).Reset(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KV_Reset_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KVServer).Reset(ctx, req.(*ResetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -360,6 +496,22 @@ var KV_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewIterator",
 			Handler:    _KV_NewIterator_Handler,
+		},
+		{
+			MethodName: "Compact",
+			Handler:    _KV_Compact_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _KV_Delete_Handler,
+		},
+		{
+			MethodName: "Put",
+			Handler:    _KV_Put_Handler,
+		},
+		{
+			MethodName: "Reset",
+			Handler:    _KV_Reset_Handler,
 		},
 		{
 			MethodName: "IteratorError",
