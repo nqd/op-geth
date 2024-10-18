@@ -6,6 +6,8 @@ option go_package = "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1";
 
 service KV {
   rpc Get(GetRequest) returns (GetResponse) {}
+  rpc Batch(BatchRequest) returns (BatchResponse) {}
+  rpc NewIterator(NewIteratorRequest) returns (NewIteratorResponse) {}
 }
 
 message GetRequest {
@@ -14,4 +16,41 @@ message GetRequest {
 
 message GetResponse {
   bytes value = 1;
+}
+
+message BatchRequest {
+  repeated Batch batches = 1;
+}
+
+message Batch {
+  bytes key = 1;
+  bytes value = 2;
+  bool delete = 3;
+}
+
+message BatchResponse {
+}
+
+
+message NewIteratorRequest {
+}
+
+message NewIteratorResponse {
+  bytes iterator_id = 1;
+}
+
+service Iterator {
+  rpc Error(IteratorErrorRequest) returns (IteratorErrorResponse) {}
+  // rpc Key(IteratorKeyRequest) returns (IteratorKeyResponse) {}
+  // rpc Next(IteratorNextRequest) returns (IteratorNextResponse) {}
+  // ...
+}
+
+message IteratorErrorRequest {
+  bytes iterator_id = 1;
+}
+
+message IteratorErrorResponse {
+  bool error = 1;
+  string msg = 2;
 }
