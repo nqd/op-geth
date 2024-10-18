@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	cockroachdbpebble "github.com/cockroachdb/pebble"
+	"github.com/cockroachdb/pebble/vfs"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/ethdb/pebble"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
@@ -43,6 +45,20 @@ func NewKVStoreWithPebble(pebbleDB *pebble.Database) *kvStore {
 		pebbleDB: pebbleDB,
 		im:       make(map[string]ethdb.Iterator, 100),
 	}
+}
+
+func NewKVStoreTest() (*kvStore, error) {
+	p, err := cockroachdbpebble.Open("", &cockroachdbpebble.Options{
+		FS: vfs.NewMem(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return &kvStore{
+		pebbleDB: pebble.NewRaw(p),
+		im:       make(map[string]ethdb.Iterator, 100),
+	}, nil
 }
 
 func (s *kvStore) Get(_ context.Context, req *api.GetRequest) (*api.GetResponse, error) {
