@@ -7,7 +7,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/ethdb/pebble"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
-	"github.com/google/uuid"
 )
 
 type kvStore struct {
@@ -48,6 +47,15 @@ func (s *kvStore) Get(_ context.Context, req *api.GetRequest) (*api.GetResponse,
 	return &api.GetResponse{Value: res}, nil
 }
 
+func (s *kvStore) Has(_ context.Context, req *api.HasRequest) (*api.HasResponse, error) {
+	found, err := s.pebbleDB.Has(req.GetKey())
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.HasResponse{Found: found}, nil
+}
+
 func (s *kvStore) Batch(_ context.Context, req *api.BatchRequest) (*api.BatchResponse, error) {
 	batch := s.pebbleDB.NewBatch()
 	for _, op := range req.GetBatches() {
@@ -72,18 +80,6 @@ func (s *kvStore) Batch(_ context.Context, req *api.BatchRequest) (*api.BatchRes
 	return &api.BatchResponse{}, nil
 }
 
-func (s *kvStore) NewIterator(_ context.Context, req *api.NewIteratorRequest) (*api.NewIteratorResponse, error) {
-	id := uuid.NewString()
-
-	it := s.pebbleDB.NewIterator(req.GetPrefix(), req.GetStart())
-
-	s.imLock.Lock()
-	s.im[id] = it
-	s.imLock.Unlock()
-
-	return &api.NewIteratorResponse{IteratorId: id}, nil
-}
-
 func (s *kvStore) Compact(_ context.Context, req *api.CompactRequest) (*api.CompactResponse, error) {
 	start := req.GetStart()
 	limit := req.GetLimit()
@@ -92,4 +88,34 @@ func (s *kvStore) Compact(_ context.Context, req *api.CompactRequest) (*api.Comp
 	}
 
 	return &api.CompactResponse{}, nil
+}
+
+func (s *kvStore) Delete(_ context.Context, req *api.DeleteRequest) (*api.DeleteResponse, error) {
+	if err := s.pebbleDB.Delete(req.GetKey()); err != nil {
+		return nil, err
+	}
+
+	return &api.DeleteResponse{}, nil
+}
+
+func (s *kvStore) Put(_ context.Context, req *api.PutRequest) (*api.PutResponse, error) {
+	if err := s.pebbleDB.Put(req.GetKey(), req.GetValue()); err != nil {
+		return nil, err
+	}
+
+	return &api.PutResponse{}, nil
+}
+
+func (s *kvStore) Reset(_ context.Context, req *api.ResetRequest) (*api.ResetResponse, error) {
+	// todo: implement
+
+	return &api.ResetResponse{}, nil
+}
+
+func (s *kvStore) Close(_ context.Context, req *api.CloseRequest) (*api.CloseResponse, error) {
+	if err := s.pebbleDB.Close(); err != nil {
+		return nil, err
+	}
+
+	return &api.CloseResponse{}, nil
 }
