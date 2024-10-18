@@ -5,8 +5,20 @@ import (
 	"errors"
 
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
+	"github.com/google/uuid"
 )
 
+func (s *kvStore) NewIterator(_ context.Context, req *api.NewIteratorRequest) (*api.NewIteratorResponse, error) {
+	id := uuid.NewString()
+
+	it := s.pebbleDB.NewIterator(req.GetPrefix(), req.GetStart())
+
+	s.imLock.Lock()
+	s.im[id] = it
+	s.imLock.Unlock()
+
+	return &api.NewIteratorResponse{IteratorId: id}, nil
+}
 func (s *kvStore) IteratorError(_ context.Context, req *api.IteratorErrorRequest) (*api.IteratorErrorResponse, error) {
 	id := req.GetIteratorId()
 

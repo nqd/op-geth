@@ -20,12 +20,14 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	KV_Get_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Get"
+	KV_Has_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Has"
 	KV_Batch_FullMethodName           = "/ethereum.rpcdb.api.v1.KV/Batch"
 	KV_NewIterator_FullMethodName     = "/ethereum.rpcdb.api.v1.KV/NewIterator"
 	KV_Compact_FullMethodName         = "/ethereum.rpcdb.api.v1.KV/Compact"
 	KV_Delete_FullMethodName          = "/ethereum.rpcdb.api.v1.KV/Delete"
 	KV_Put_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Put"
 	KV_Reset_FullMethodName           = "/ethereum.rpcdb.api.v1.KV/Reset"
+	KV_Close_FullMethodName           = "/ethereum.rpcdb.api.v1.KV/Close"
 	KV_IteratorError_FullMethodName   = "/ethereum.rpcdb.api.v1.KV/IteratorError"
 	KV_IteratorKey_FullMethodName     = "/ethereum.rpcdb.api.v1.KV/IteratorKey"
 	KV_IteratorNext_FullMethodName    = "/ethereum.rpcdb.api.v1.KV/IteratorNext"
@@ -38,12 +40,14 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KVClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	Has(ctx context.Context, in *HasRequest, opts ...grpc.CallOption) (*HasResponse, error)
 	Batch(ctx context.Context, in *BatchRequest, opts ...grpc.CallOption) (*BatchResponse, error)
 	NewIterator(ctx context.Context, in *NewIteratorRequest, opts ...grpc.CallOption) (*NewIteratorResponse, error)
 	Compact(ctx context.Context, in *CompactRequest, opts ...grpc.CallOption) (*CompactResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*PutResponse, error)
 	Reset(ctx context.Context, in *ResetRequest, opts ...grpc.CallOption) (*ResetResponse, error)
+	Close(ctx context.Context, in *CloseRequest, opts ...grpc.CallOption) (*CloseResponse, error)
 	IteratorError(ctx context.Context, in *IteratorErrorRequest, opts ...grpc.CallOption) (*IteratorErrorResponse, error)
 	IteratorKey(ctx context.Context, in *IteratorKeyRequest, opts ...grpc.CallOption) (*IteratorKeyResponse, error)
 	IteratorNext(ctx context.Context, in *IteratorNextRequest, opts ...grpc.CallOption) (*IteratorNextResponse, error)
@@ -63,6 +67,16 @@ func (c *kVClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOpt
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetResponse)
 	err := c.cc.Invoke(ctx, KV_Get_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *kVClient) Has(ctx context.Context, in *HasRequest, opts ...grpc.CallOption) (*HasResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HasResponse)
+	err := c.cc.Invoke(ctx, KV_Has_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -129,6 +143,16 @@ func (c *kVClient) Reset(ctx context.Context, in *ResetRequest, opts ...grpc.Cal
 	return out, nil
 }
 
+func (c *kVClient) Close(ctx context.Context, in *CloseRequest, opts ...grpc.CallOption) (*CloseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CloseResponse)
+	err := c.cc.Invoke(ctx, KV_Close_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *kVClient) IteratorError(ctx context.Context, in *IteratorErrorRequest, opts ...grpc.CallOption) (*IteratorErrorResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(IteratorErrorResponse)
@@ -184,12 +208,14 @@ func (c *kVClient) IteratorValue(ctx context.Context, in *IteratorValueRequest, 
 // for forward compatibility.
 type KVServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
+	Has(context.Context, *HasRequest) (*HasResponse, error)
 	Batch(context.Context, *BatchRequest) (*BatchResponse, error)
 	NewIterator(context.Context, *NewIteratorRequest) (*NewIteratorResponse, error)
 	Compact(context.Context, *CompactRequest) (*CompactResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	Put(context.Context, *PutRequest) (*PutResponse, error)
 	Reset(context.Context, *ResetRequest) (*ResetResponse, error)
+	Close(context.Context, *CloseRequest) (*CloseResponse, error)
 	IteratorError(context.Context, *IteratorErrorRequest) (*IteratorErrorResponse, error)
 	IteratorKey(context.Context, *IteratorKeyRequest) (*IteratorKeyResponse, error)
 	IteratorNext(context.Context, *IteratorNextRequest) (*IteratorNextResponse, error)
@@ -208,6 +234,9 @@ type UnimplementedKVServer struct{}
 func (UnimplementedKVServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
+func (UnimplementedKVServer) Has(context.Context, *HasRequest) (*HasResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Has not implemented")
+}
 func (UnimplementedKVServer) Batch(context.Context, *BatchRequest) (*BatchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Batch not implemented")
 }
@@ -225,6 +254,9 @@ func (UnimplementedKVServer) Put(context.Context, *PutRequest) (*PutResponse, er
 }
 func (UnimplementedKVServer) Reset(context.Context, *ResetRequest) (*ResetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Reset not implemented")
+}
+func (UnimplementedKVServer) Close(context.Context, *CloseRequest) (*CloseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Close not implemented")
 }
 func (UnimplementedKVServer) IteratorError(context.Context, *IteratorErrorRequest) (*IteratorErrorResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IteratorError not implemented")
@@ -276,6 +308,24 @@ func _KV_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{})
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(KVServer).Get(ctx, req.(*GetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KV_Has_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HasRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KVServer).Has(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KV_Has_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KVServer).Has(ctx, req.(*HasRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -388,6 +438,24 @@ func _KV_Reset_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KV_Close_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KVServer).Close(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KV_Close_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KVServer).Close(ctx, req.(*CloseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _KV_IteratorError_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IteratorErrorRequest)
 	if err := dec(in); err != nil {
@@ -490,6 +558,10 @@ var KV_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _KV_Get_Handler,
 		},
 		{
+			MethodName: "Has",
+			Handler:    _KV_Has_Handler,
+		},
+		{
 			MethodName: "Batch",
 			Handler:    _KV_Batch_Handler,
 		},
@@ -512,6 +584,10 @@ var KV_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Reset",
 			Handler:    _KV_Reset_Handler,
+		},
+		{
+			MethodName: "Close",
+			Handler:    _KV_Close_Handler,
 		},
 		{
 			MethodName: "IteratorError",
