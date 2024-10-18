@@ -114,6 +114,725 @@ func (x *GetResponse) GetValue() []byte {
 	return nil
 }
 
+type BatchRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Batches []*Batch `protobuf:"bytes,1,rep,name=batches,proto3" json:"batches,omitempty"`
+}
+
+func (x *BatchRequest) Reset() {
+	*x = BatchRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BatchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchRequest) ProtoMessage() {}
+
+func (x *BatchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchRequest.ProtoReflect.Descriptor instead.
+func (*BatchRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *BatchRequest) GetBatches() []*Batch {
+	if x != nil {
+		return x.Batches
+	}
+	return nil
+}
+
+type Batch struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key    []byte `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value  []byte `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
+	Delete bool   `protobuf:"varint,3,opt,name=delete,proto3" json:"delete,omitempty"`
+}
+
+func (x *Batch) Reset() {
+	*x = Batch{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Batch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Batch) ProtoMessage() {}
+
+func (x *Batch) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Batch.ProtoReflect.Descriptor instead.
+func (*Batch) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Batch) GetKey() []byte {
+	if x != nil {
+		return x.Key
+	}
+	return nil
+}
+
+func (x *Batch) GetValue() []byte {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
+func (x *Batch) GetDelete() bool {
+	if x != nil {
+		return x.Delete
+	}
+	return false
+}
+
+type BatchResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *BatchResponse) Reset() {
+	*x = BatchResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BatchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchResponse) ProtoMessage() {}
+
+func (x *BatchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchResponse.ProtoReflect.Descriptor instead.
+func (*BatchResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{4}
+}
+
+type NewIteratorRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Prefix []byte `protobuf:"bytes,1,opt,name=prefix,proto3" json:"prefix,omitempty"`
+	Start  []byte `protobuf:"bytes,2,opt,name=start,proto3" json:"start,omitempty"`
+}
+
+func (x *NewIteratorRequest) Reset() {
+	*x = NewIteratorRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewIteratorRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewIteratorRequest) ProtoMessage() {}
+
+func (x *NewIteratorRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewIteratorRequest.ProtoReflect.Descriptor instead.
+func (*NewIteratorRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *NewIteratorRequest) GetPrefix() []byte {
+	if x != nil {
+		return x.Prefix
+	}
+	return nil
+}
+
+func (x *NewIteratorRequest) GetStart() []byte {
+	if x != nil {
+		return x.Start
+	}
+	return nil
+}
+
+type NewIteratorResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IteratorId string `protobuf:"bytes,1,opt,name=iterator_id,json=iteratorId,proto3" json:"iterator_id,omitempty"`
+}
+
+func (x *NewIteratorResponse) Reset() {
+	*x = NewIteratorResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewIteratorResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewIteratorResponse) ProtoMessage() {}
+
+func (x *NewIteratorResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewIteratorResponse.ProtoReflect.Descriptor instead.
+func (*NewIteratorResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *NewIteratorResponse) GetIteratorId() string {
+	if x != nil {
+		return x.IteratorId
+	}
+	return ""
+}
+
+type IteratorErrorRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IteratorId string `protobuf:"bytes,1,opt,name=iterator_id,json=iteratorId,proto3" json:"iterator_id,omitempty"`
+}
+
+func (x *IteratorErrorRequest) Reset() {
+	*x = IteratorErrorRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorErrorRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorErrorRequest) ProtoMessage() {}
+
+func (x *IteratorErrorRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorErrorRequest.ProtoReflect.Descriptor instead.
+func (*IteratorErrorRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *IteratorErrorRequest) GetIteratorId() string {
+	if x != nil {
+		return x.IteratorId
+	}
+	return ""
+}
+
+type IteratorErrorResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Error bool   `protobuf:"varint,1,opt,name=error,proto3" json:"error,omitempty"`
+	Msg   string `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
+}
+
+func (x *IteratorErrorResponse) Reset() {
+	*x = IteratorErrorResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorErrorResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorErrorResponse) ProtoMessage() {}
+
+func (x *IteratorErrorResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorErrorResponse.ProtoReflect.Descriptor instead.
+func (*IteratorErrorResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *IteratorErrorResponse) GetError() bool {
+	if x != nil {
+		return x.Error
+	}
+	return false
+}
+
+func (x *IteratorErrorResponse) GetMsg() string {
+	if x != nil {
+		return x.Msg
+	}
+	return ""
+}
+
+type IteratorKeyRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IteratorId string `protobuf:"bytes,1,opt,name=iterator_id,json=iteratorId,proto3" json:"iterator_id,omitempty"`
+}
+
+func (x *IteratorKeyRequest) Reset() {
+	*x = IteratorKeyRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorKeyRequest) ProtoMessage() {}
+
+func (x *IteratorKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorKeyRequest.ProtoReflect.Descriptor instead.
+func (*IteratorKeyRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *IteratorKeyRequest) GetIteratorId() string {
+	if x != nil {
+		return x.IteratorId
+	}
+	return ""
+}
+
+type IteratorKeyResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Key []byte `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+}
+
+func (x *IteratorKeyResponse) Reset() {
+	*x = IteratorKeyResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorKeyResponse) ProtoMessage() {}
+
+func (x *IteratorKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorKeyResponse.ProtoReflect.Descriptor instead.
+func (*IteratorKeyResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *IteratorKeyResponse) GetKey() []byte {
+	if x != nil {
+		return x.Key
+	}
+	return nil
+}
+
+type IteratorNextRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IteratorId string `protobuf:"bytes,1,opt,name=iterator_id,json=iteratorId,proto3" json:"iterator_id,omitempty"`
+}
+
+func (x *IteratorNextRequest) Reset() {
+	*x = IteratorNextRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorNextRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorNextRequest) ProtoMessage() {}
+
+func (x *IteratorNextRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorNextRequest.ProtoReflect.Descriptor instead.
+func (*IteratorNextRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *IteratorNextRequest) GetIteratorId() string {
+	if x != nil {
+		return x.IteratorId
+	}
+	return ""
+}
+
+type IteratorNextResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Next bool `protobuf:"varint,1,opt,name=next,proto3" json:"next,omitempty"`
+}
+
+func (x *IteratorNextResponse) Reset() {
+	*x = IteratorNextResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorNextResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorNextResponse) ProtoMessage() {}
+
+func (x *IteratorNextResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorNextResponse.ProtoReflect.Descriptor instead.
+func (*IteratorNextResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *IteratorNextResponse) GetNext() bool {
+	if x != nil {
+		return x.Next
+	}
+	return false
+}
+
+type IteratorReleaseRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IteratorId string `protobuf:"bytes,1,opt,name=iterator_id,json=iteratorId,proto3" json:"iterator_id,omitempty"`
+}
+
+func (x *IteratorReleaseRequest) Reset() {
+	*x = IteratorReleaseRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorReleaseRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorReleaseRequest) ProtoMessage() {}
+
+func (x *IteratorReleaseRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorReleaseRequest.ProtoReflect.Descriptor instead.
+func (*IteratorReleaseRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *IteratorReleaseRequest) GetIteratorId() string {
+	if x != nil {
+		return x.IteratorId
+	}
+	return ""
+}
+
+type IteratorReleaseResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *IteratorReleaseResponse) Reset() {
+	*x = IteratorReleaseResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorReleaseResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorReleaseResponse) ProtoMessage() {}
+
+func (x *IteratorReleaseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorReleaseResponse.ProtoReflect.Descriptor instead.
+func (*IteratorReleaseResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{14}
+}
+
+type IteratorValueRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IteratorId string `protobuf:"bytes,1,opt,name=iterator_id,json=iteratorId,proto3" json:"iterator_id,omitempty"`
+}
+
+func (x *IteratorValueRequest) Reset() {
+	*x = IteratorValueRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorValueRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorValueRequest) ProtoMessage() {}
+
+func (x *IteratorValueRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorValueRequest.ProtoReflect.Descriptor instead.
+func (*IteratorValueRequest) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *IteratorValueRequest) GetIteratorId() string {
+	if x != nil {
+		return x.IteratorId
+	}
+	return ""
+}
+
+type IteratorValueResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Value []byte `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+}
+
+func (x *IteratorValueResponse) Reset() {
+	*x = IteratorValueResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_kvdb_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *IteratorValueResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IteratorValueResponse) ProtoMessage() {}
+
+func (x *IteratorValueResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_kvdb_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IteratorValueResponse.ProtoReflect.Descriptor instead.
+func (*IteratorValueResponse) Descriptor() ([]byte, []int) {
+	return file_kvdb_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *IteratorValueResponse) GetValue() []byte {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
 var File_kvdb_proto protoreflect.FileDescriptor
 
 var file_kvdb_proto_rawDesc = []byte{
@@ -123,17 +842,112 @@ var file_kvdb_proto_rawDesc = []byte{
 	0x74, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x03,
 	0x6b, 0x65, 0x79, 0x22, 0x23, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
 	0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0c, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x32, 0x54, 0x0a, 0x02, 0x4b, 0x56, 0x12, 0x4e,
-	0x0a, 0x03, 0x47, 0x65, 0x74, 0x12, 0x21, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d,
-	0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65,
-	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72,
+	0x0c, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x46, 0x0a, 0x0c, 0x42, 0x61, 0x74, 0x63,
+	0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x36, 0x0a, 0x07, 0x62, 0x61, 0x74, 0x63,
+	0x68, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x65, 0x74, 0x68, 0x65,
+	0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x07, 0x62, 0x61, 0x74, 0x63, 0x68, 0x65, 0x73,
+	0x22, 0x47, 0x0a, 0x05, 0x42, 0x61, 0x74, 0x63, 0x68, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76,
+	0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75,
+	0x65, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x06, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x22, 0x0f, 0x0a, 0x0d, 0x42, 0x61, 0x74,
+	0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x42, 0x0a, 0x12, 0x4e, 0x65,
+	0x77, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x16, 0x0a, 0x06, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c,
+	0x52, 0x06, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x72,
+	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x73, 0x74, 0x61, 0x72, 0x74, 0x22, 0x36,
+	0x0a, 0x13, 0x4e, 0x65, 0x77, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x74, 0x65, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x49, 0x64, 0x22, 0x37, 0x0a, 0x14, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f,
+	0x0a, 0x0b, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x64, 0x22,
+	0x3f, 0x0a, 0x15, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x45, 0x72, 0x72, 0x6f, 0x72,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x10,
+	0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67,
+	0x22, 0x35, 0x0a, 0x12, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x4b, 0x65, 0x79, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x74, 0x65,
+	0x72, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x64, 0x22, 0x27, 0x0a, 0x13, 0x49, 0x74, 0x65, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10,
+	0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x03, 0x6b, 0x65, 0x79,
+	0x22, 0x36, 0x0a, 0x13, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x4e, 0x65, 0x78, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x74, 0x65, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x74,
+	0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x64, 0x22, 0x2a, 0x0a, 0x14, 0x49, 0x74, 0x65, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x4e, 0x65, 0x78, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x65, 0x78, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04,
+	0x6e, 0x65, 0x78, 0x74, 0x22, 0x39, 0x0a, 0x16, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72,
+	0x52, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1f,
+	0x0a, 0x0b, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x49, 0x64, 0x22,
+	0x19, 0x0a, 0x17, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x6c, 0x65, 0x61,
+	0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x37, 0x0a, 0x14, 0x49, 0x74,
+	0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x49, 0x64, 0x22, 0x2d, 0x0a, 0x15, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x56,
+	0x61, 0x6c, 0x75, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05,
+	0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x76, 0x61, 0x6c,
+	0x75, 0x65, 0x32, 0xb5, 0x06, 0x0a, 0x02, 0x4b, 0x56, 0x12, 0x4e, 0x0a, 0x03, 0x47, 0x65, 0x74,
+	0x12, 0x21, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64,
+	0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72,
+	0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x54, 0x0a, 0x05, 0x42, 0x61, 0x74,
+	0x63, 0x68, 0x12, 0x23, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70,
+	0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x42, 0x61, 0x74, 0x63, 0x68,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65,
+	0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e,
+	0x42, 0x61, 0x74, 0x63, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x66, 0x0a, 0x0b, 0x4e, 0x65, 0x77, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x29,
+	0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e,
+	0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4e, 0x65, 0x77, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2a, 0x2e, 0x65, 0x74, 0x68, 0x65,
+	0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x4e, 0x65, 0x77, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x6c, 0x0a, 0x0d, 0x49, 0x74, 0x65, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x2b, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72,
 	0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31,
-	0x2e, 0x47, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x3b,
-	0x5a, 0x39, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68,
-	0x65, 0x72, 0x65, 0x75, 0x6d, 0x2f, 0x67, 0x6f, 0x2d, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75,
-	0x6d, 0x2f, 0x65, 0x74, 0x68, 0x64, 0x62, 0x2f, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2f, 0x67, 0x65,
-	0x6e, 0x2f, 0x67, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d,
+	0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x74,
+	0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x66, 0x0a, 0x0b, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x4b, 0x65, 0x79, 0x12, 0x29, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e,
+	0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x74, 0x65,
+	0x72, 0x61, 0x74, 0x6f, 0x72, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x2a, 0x2e, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62,
+	0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72,
+	0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x69, 0x0a,
+	0x0c, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x4e, 0x65, 0x78, 0x74, 0x12, 0x2a, 0x2e,
+	0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x4e, 0x65,
+	0x78, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2b, 0x2e, 0x65, 0x74, 0x68, 0x65,
+	0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x4e, 0x65, 0x78, 0x74, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x72, 0x0a, 0x0f, 0x49, 0x74, 0x65, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x6c, 0x65, 0x61, 0x73, 0x65, 0x12, 0x2d, 0x2e, 0x65, 0x74,
+	0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69,
+	0x2e, 0x76, 0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x6c, 0x65,
+	0x61, 0x73, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x65, 0x74, 0x68,
+	0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x6c, 0x65, 0x61,
+	0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x6c, 0x0a, 0x0d,
+	0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x2b, 0x2e,
+	0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61,
+	0x70, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x56, 0x61,
+	0x6c, 0x75, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x65, 0x74, 0x68,
+	0x65, 0x72, 0x65, 0x75, 0x6d, 0x2e, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2e, 0x61, 0x70, 0x69, 0x2e,
+	0x76, 0x31, 0x2e, 0x49, 0x74, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x56, 0x61, 0x6c, 0x75, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x3b, 0x5a, 0x39, 0x67, 0x69,
+	0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75,
+	0x6d, 0x2f, 0x67, 0x6f, 0x2d, 0x65, 0x74, 0x68, 0x65, 0x72, 0x65, 0x75, 0x6d, 0x2f, 0x65, 0x74,
+	0x68, 0x64, 0x62, 0x2f, 0x72, 0x70, 0x63, 0x64, 0x62, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x67, 0x6f,
+	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -148,19 +962,49 @@ func file_kvdb_proto_rawDescGZIP() []byte {
 	return file_kvdb_proto_rawDescData
 }
 
-var file_kvdb_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_kvdb_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_kvdb_proto_goTypes = []any{
-	(*GetRequest)(nil),  // 0: ethereum.rpcdb.api.v1.GetRequest
-	(*GetResponse)(nil), // 1: ethereum.rpcdb.api.v1.GetResponse
+	(*GetRequest)(nil),              // 0: ethereum.rpcdb.api.v1.GetRequest
+	(*GetResponse)(nil),             // 1: ethereum.rpcdb.api.v1.GetResponse
+	(*BatchRequest)(nil),            // 2: ethereum.rpcdb.api.v1.BatchRequest
+	(*Batch)(nil),                   // 3: ethereum.rpcdb.api.v1.Batch
+	(*BatchResponse)(nil),           // 4: ethereum.rpcdb.api.v1.BatchResponse
+	(*NewIteratorRequest)(nil),      // 5: ethereum.rpcdb.api.v1.NewIteratorRequest
+	(*NewIteratorResponse)(nil),     // 6: ethereum.rpcdb.api.v1.NewIteratorResponse
+	(*IteratorErrorRequest)(nil),    // 7: ethereum.rpcdb.api.v1.IteratorErrorRequest
+	(*IteratorErrorResponse)(nil),   // 8: ethereum.rpcdb.api.v1.IteratorErrorResponse
+	(*IteratorKeyRequest)(nil),      // 9: ethereum.rpcdb.api.v1.IteratorKeyRequest
+	(*IteratorKeyResponse)(nil),     // 10: ethereum.rpcdb.api.v1.IteratorKeyResponse
+	(*IteratorNextRequest)(nil),     // 11: ethereum.rpcdb.api.v1.IteratorNextRequest
+	(*IteratorNextResponse)(nil),    // 12: ethereum.rpcdb.api.v1.IteratorNextResponse
+	(*IteratorReleaseRequest)(nil),  // 13: ethereum.rpcdb.api.v1.IteratorReleaseRequest
+	(*IteratorReleaseResponse)(nil), // 14: ethereum.rpcdb.api.v1.IteratorReleaseResponse
+	(*IteratorValueRequest)(nil),    // 15: ethereum.rpcdb.api.v1.IteratorValueRequest
+	(*IteratorValueResponse)(nil),   // 16: ethereum.rpcdb.api.v1.IteratorValueResponse
 }
 var file_kvdb_proto_depIdxs = []int32{
-	0, // 0: ethereum.rpcdb.api.v1.KV.Get:input_type -> ethereum.rpcdb.api.v1.GetRequest
-	1, // 1: ethereum.rpcdb.api.v1.KV.Get:output_type -> ethereum.rpcdb.api.v1.GetResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3,  // 0: ethereum.rpcdb.api.v1.BatchRequest.batches:type_name -> ethereum.rpcdb.api.v1.Batch
+	0,  // 1: ethereum.rpcdb.api.v1.KV.Get:input_type -> ethereum.rpcdb.api.v1.GetRequest
+	2,  // 2: ethereum.rpcdb.api.v1.KV.Batch:input_type -> ethereum.rpcdb.api.v1.BatchRequest
+	5,  // 3: ethereum.rpcdb.api.v1.KV.NewIterator:input_type -> ethereum.rpcdb.api.v1.NewIteratorRequest
+	7,  // 4: ethereum.rpcdb.api.v1.KV.IteratorError:input_type -> ethereum.rpcdb.api.v1.IteratorErrorRequest
+	9,  // 5: ethereum.rpcdb.api.v1.KV.IteratorKey:input_type -> ethereum.rpcdb.api.v1.IteratorKeyRequest
+	11, // 6: ethereum.rpcdb.api.v1.KV.IteratorNext:input_type -> ethereum.rpcdb.api.v1.IteratorNextRequest
+	13, // 7: ethereum.rpcdb.api.v1.KV.IteratorRelease:input_type -> ethereum.rpcdb.api.v1.IteratorReleaseRequest
+	15, // 8: ethereum.rpcdb.api.v1.KV.IteratorValue:input_type -> ethereum.rpcdb.api.v1.IteratorValueRequest
+	1,  // 9: ethereum.rpcdb.api.v1.KV.Get:output_type -> ethereum.rpcdb.api.v1.GetResponse
+	4,  // 10: ethereum.rpcdb.api.v1.KV.Batch:output_type -> ethereum.rpcdb.api.v1.BatchResponse
+	6,  // 11: ethereum.rpcdb.api.v1.KV.NewIterator:output_type -> ethereum.rpcdb.api.v1.NewIteratorResponse
+	8,  // 12: ethereum.rpcdb.api.v1.KV.IteratorError:output_type -> ethereum.rpcdb.api.v1.IteratorErrorResponse
+	10, // 13: ethereum.rpcdb.api.v1.KV.IteratorKey:output_type -> ethereum.rpcdb.api.v1.IteratorKeyResponse
+	12, // 14: ethereum.rpcdb.api.v1.KV.IteratorNext:output_type -> ethereum.rpcdb.api.v1.IteratorNextResponse
+	14, // 15: ethereum.rpcdb.api.v1.KV.IteratorRelease:output_type -> ethereum.rpcdb.api.v1.IteratorReleaseResponse
+	16, // 16: ethereum.rpcdb.api.v1.KV.IteratorValue:output_type -> ethereum.rpcdb.api.v1.IteratorValueResponse
+	9,  // [9:17] is the sub-list for method output_type
+	1,  // [1:9] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_kvdb_proto_init() }
@@ -193,6 +1037,186 @@ func file_kvdb_proto_init() {
 				return nil
 			}
 		}
+		file_kvdb_proto_msgTypes[2].Exporter = func(v any, i int) any {
+			switch v := v.(*BatchRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[3].Exporter = func(v any, i int) any {
+			switch v := v.(*Batch); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[4].Exporter = func(v any, i int) any {
+			switch v := v.(*BatchResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[5].Exporter = func(v any, i int) any {
+			switch v := v.(*NewIteratorRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[6].Exporter = func(v any, i int) any {
+			switch v := v.(*NewIteratorResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[7].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorErrorRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[8].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorErrorResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[9].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorKeyRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[10].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorKeyResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[11].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorNextRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[12].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorNextResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[13].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorReleaseRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[14].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorReleaseResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[15].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorValueRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_kvdb_proto_msgTypes[16].Exporter = func(v any, i int) any {
+			switch v := v.(*IteratorValueResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -200,7 +1224,7 @@ func file_kvdb_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_kvdb_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
