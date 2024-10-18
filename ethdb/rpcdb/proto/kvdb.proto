@@ -8,6 +8,12 @@ service KV {
   rpc Get(GetRequest) returns (GetResponse) {}
   rpc Batch(BatchRequest) returns (BatchResponse) {}
   rpc NewIterator(NewIteratorRequest) returns (NewIteratorResponse) {}
+
+  rpc IteratorError(IteratorErrorRequest) returns (IteratorErrorResponse) {}
+  rpc IteratorKey(IteratorKeyRequest) returns (IteratorKeyResponse) {}
+  rpc IteratorNext(IteratorNextRequest) returns (IteratorNextResponse) {}
+  rpc IteratorRelease(IteratorReleaseRequest) returns (IteratorReleaseResponse) {}
+  rpc IteratorValue(IteratorValueRequest) returns (IteratorValueResponse) {}
 }
 
 message GetRequest {
@@ -31,26 +37,52 @@ message Batch {
 message BatchResponse {
 }
 
-
 message NewIteratorRequest {
+  bytes prefix = 1;
+  bytes start = 2;
 }
 
 message NewIteratorResponse {
-  bytes iterator_id = 1;
+  string iterator_id = 1;
 }
 
-service Iterator {
-  rpc Error(IteratorErrorRequest) returns (IteratorErrorResponse) {}
-  // rpc Key(IteratorKeyRequest) returns (IteratorKeyResponse) {}
-  // rpc Next(IteratorNextRequest) returns (IteratorNextResponse) {}
-  // ...
-}
 
 message IteratorErrorRequest {
-  bytes iterator_id = 1;
+  string iterator_id = 1;
 }
 
 message IteratorErrorResponse {
   bool error = 1;
   string msg = 2;
+}
+
+message IteratorKeyRequest {
+  string iterator_id = 1;
+}
+
+message IteratorKeyResponse {
+  bytes key = 1;
+}
+
+message IteratorNextRequest {
+  string iterator_id = 1;
+}
+
+message IteratorNextResponse {
+  bool next = 1;
+}
+
+message IteratorReleaseRequest {
+  string iterator_id = 1;
+}
+
+message IteratorReleaseResponse {
+}
+
+message IteratorValueRequest {
+  string iterator_id = 1;
+}
+
+message IteratorValueResponse {
+  bytes value = 1;
 }
