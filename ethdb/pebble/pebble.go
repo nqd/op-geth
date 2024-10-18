@@ -142,6 +142,10 @@ func (l panicLogger) Fatalf(format string, args ...interface{}) {
 	panic(fmt.Errorf("fatal: "+format, args...))
 }
 
+func NewRaw(db *pebble.DB) *Database {
+	return &Database{db: db}
+}
+
 // New returns a wrapped pebble DB object. The namespace is the prefix that the
 // metrics reporting should use for surfacing internal stats.
 func New(file string, cache int, handles int, namespace string, readonly bool, ephemeral bool) (*Database, error) {

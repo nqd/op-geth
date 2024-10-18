@@ -38,6 +38,13 @@ func NewKVStore() (*kvStore, error) {
 	}, nil
 }
 
+func NewKVStoreWithPebble(pebbleDB *pebble.Database) *kvStore {
+	return &kvStore{
+		pebbleDB: pebbleDB,
+		im:       make(map[string]ethdb.Iterator, 100),
+	}
+}
+
 func (s *kvStore) Get(_ context.Context, req *api.GetRequest) (*api.GetResponse, error) {
 	res, err := s.pebbleDB.Get(req.GetKey())
 	if err != nil {
