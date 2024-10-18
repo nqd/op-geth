@@ -1,40 +1,31 @@
 package main
 
 import (
+	"log"
 	"net"
 
-	"github.com/cockroachdb/pebble"
-	"github.com/cockroachdb/pebble/vfs"
-	ethdbpebble "github.com/ethereum/go-ethereum/ethdb/pebble"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
 	"github.com/ethereum/go-ethereum/ethdb/rpcdb/handler"
-	"github.com/ethereum/go-ethereum/log"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	p, err := pebble.Open("", &pebble.Options{
-		FS: vfs.NewMem(),
-	})
-
+	h, err := handler.NewKVStoreTest()
 	if err != nil {
 		panic(err)
 	}
-
-	defer p.Close()
-
-	h := handler.NewKVStoreWithPebble(ethdbpebble.NewRaw(p))
 
 	server := grpc.NewServer()
 
 	api.RegisterKVServer(server, h)
 
-	listener, err := net.Listen("tcp", "0.0.0.0:6789")
+	addr := "0.0.0.0:6789"
+	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Info("Starting server")
+	log.Println("Starting KV server", "address: ", addr)
 
 	if err := server.Serve(listener); err != nil {
 		panic(err)
