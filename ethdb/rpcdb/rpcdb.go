@@ -80,12 +80,18 @@ func (d *Database) Stat() (string, error) {
 
 // NewBatch implements ethdb.KeyValueStore.
 func (d *Database) NewBatch() ethdb.Batch {
-	panic("unimplemented")
+	return &batch{
+		d:      d,
+		writes: make([]*api.Batch, 0),
+	}
 }
 
 // NewBatchWithSize implements ethdb.KeyValueStore.
 func (d *Database) NewBatchWithSize(size int) ethdb.Batch {
-	panic("unimplemented")
+	return &batch{
+		d:      d,
+		writes: make([]*api.Batch, 0, size),
+	}
 }
 
 type batch struct {
