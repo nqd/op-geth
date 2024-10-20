@@ -18,7 +18,10 @@ func main() {
 
 	h := handler.NewKVStoreWithPebble(p)
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.MaxRecvMsgSize(100*1024*1024), // 100 MB
+		grpc.MaxSendMsgSize(100*1024*1024), // 100 MB
+	)
 
 	api.RegisterKVServer(server, h)
 
