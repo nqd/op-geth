@@ -4,16 +4,19 @@ import (
 	"log"
 	"net"
 
+	"github.com/ethereum/go-ethereum/ethdb/pebble"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
 	"github.com/ethereum/go-ethereum/ethdb/rpcdb/handler"
 	"google.golang.org/grpc"
 )
 
 func main() {
-	h, err := handler.NewKVStoreTest()
+	p, err := newPebble()
 	if err != nil {
-		panic(err)
+		log.Panic("Failed to create pebble database", "err", err)
 	}
+
+	h := handler.NewKVStoreWithPebble(p)
 
 	server := grpc.NewServer()
 
@@ -30,4 +33,15 @@ func main() {
 	if err := server.Serve(listener); err != nil {
 		panic(err)
 	}
+}
+
+func newPebble() (*pebble.Database, error) {
+	directory := "~/tmp-rpcdb/geth/chaindata"
+	cache := 2048
+	handle := 5120
+	namespace := "rpcdb"
+	readonly := false
+	ephemeral := false
+
+	return pebble.New(directory, cache, handle, namespace, readonly, ephemeral)
 }

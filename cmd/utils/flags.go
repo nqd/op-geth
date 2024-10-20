@@ -1553,8 +1553,8 @@ func SetNodeConfig(ctx *cli.Context, cfg *node.Config) {
 	}
 	if ctx.IsSet(DBEngineFlag.Name) {
 		dbEngine := ctx.String(DBEngineFlag.Name)
-		if dbEngine != "leveldb" && dbEngine != "pebble" && dbEngine != "redis" {
-			Fatalf("Invalid choice for db.engine '%s', allowed 'leveldb' or 'pebble'", dbEngine)
+		if dbEngine != "leveldb" && dbEngine != "pebble" && dbEngine != "redis" && dbEngine != "rpcdb" {
+			Fatalf("Invalid choice for db.engine '%s', allowed 'leveldb', 'pebble', 'redis', or 'rpcdb'", dbEngine)
 		}
 		log.Info(fmt.Sprintf("Using %s as db engine", dbEngine))
 		cfg.DBEngine = dbEngine
