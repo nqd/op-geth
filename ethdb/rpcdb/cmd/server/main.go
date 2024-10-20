@@ -3,11 +3,23 @@ package main
 import (
 	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof" // Register pprof handlers
+	"os"
+	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/ethdb/pebble"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
 	"github.com/ethereum/go-ethereum/ethdb/rpcdb/handler"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+)
+
+const (
+	addr           = "0.0.0.0:6789"
+	maxMsgSize     = 100 * 1024 * 1024 // 100 MB
+	prometheusAddr = "0.0.0.0:9801"
 )
 
 func main() {
@@ -19,13 +31,17 @@ func main() {
 	h := handler.NewKVStoreWithPebble(p)
 
 	server := grpc.NewServer(
-		grpc.MaxRecvMsgSize(100*1024*1024), // 100 MB
-		grpc.MaxSendMsgSize(100*1024*1024), // 100 MB
+		grpc.MaxRecvMsgSize(maxMsgSize),
+		grpc.MaxSendMsgSize(maxMsgSize),
+		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
 	)
 
 	api.RegisterKVServer(server, h)
 
-	addr := "0.0.0.0:6789"
+	// Enable gRPC Prometheus monitoring
+	grpc_prometheus.Register(server)
+	startPrometheus()
+
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		panic(err)
@@ -39,7 +55,12 @@ func main() {
 }
 
 func newPebble() (*pebble.Database, error) {
-	directory := "~/tmp-rpcdb/geth/chaindata"
+	h, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	directory := filepath.Join(h, "tmp-rpcdb/geth/chaindata")
 	cache := 2048
 	handle := 5120
 	namespace := "rpcdb"
@@ -47,4 +68,17 @@ func newPebble() (*pebble.Database, error) {
 	ephemeral := false
 
 	return pebble.New(directory, cache, handle, namespace, readonly, ephemeral)
+}
+
+func startPrometheus() {
+	// Start Prometheus metrics server
+	http.Handle("/metrics", promhttp.Handler())
+	go func() {
+		log.Printf("Starting metrics server at address: %s\n", prometheusAddr)
+		log.Printf("\tprometheus metrics available at %s/metrics\n", prometheusAddr)
+		log.Printf("\tpprof available at %s/debug/pprof/\n", prometheusAddr)
+		if err := http.ListenAndServe(prometheusAddr, nil); err != nil {
+			log.Panic("Failed to start Prometheus metrics server", "err", err)
+		}
+	}()
 }
