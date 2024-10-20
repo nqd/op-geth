@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -345,6 +346,11 @@ func NewRedisDBDatabase(addr string, namespace string) (ethdb.Database, error) {
 func NewRpcDBDatabase(addr string) (ethdb.Database, error) {
 	conn, err := grpc.NewClient(addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		// grpc.WithMaxMsgSize()
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(math.MaxInt64),
+			grpc.MaxCallSendMsgSize(math.MaxInt64),
+		),
 	)
 	if err != nil {
 		return nil, err
