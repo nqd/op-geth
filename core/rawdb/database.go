@@ -342,18 +342,24 @@ func NewRedisDBDatabase(addr string, namespace string) (ethdb.Database, error) {
 	return NewDatabase(db), nil
 }
 
-func NewRpcDBDatabase(addr string) (ethdb.Database, error) {
-	conn, err := grpc.NewClient(addr,
-		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(100*1024*1024), // 100 MB
-			grpc.MaxCallSendMsgSize(100*1024*1024), // 100 MB
-		),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		return nil, err
+func NewRpcDBDatabase(addrs []string) (ethdb.Database, error) {
+	conns := make(map[string]*grpc.ClientConn, len(addrs))
+
+	for _, addr := range addrs {
+		conn, err := grpc.NewClient(addr,
+			grpc.WithDefaultCallOptions(
+				grpc.MaxCallRecvMsgSize(100*1024*1024), // 100 MB
+				grpc.MaxCallSendMsgSize(100*1024*1024), // 100 MB
+			),
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+		)
+		if err != nil {
+			return nil, err
+		}
+		conns[addr] = conn
 	}
-	db := rpcdb.New(conn)
+
+	db := rpcdb.New(conns)
 
 	return NewDatabase(db), nil
 }
@@ -428,10 +434,11 @@ func openKeyValueDatabase(o OpenOptions) (ethdb.Database, error) {
 	}
 
 	if o.Type == dbRpcdb {
-		addr := os.Getenv("GETH_RPCDB_ADDR")
-		log.Info("Using rpcdb as the backing database")
+		addrStr := os.Getenv("GETH_RPCDB_ADDR")
+		addrs := strings.Split(addrStr, ",")
+		log.Info("Using rpcdb as the backing database", "addr", addrs)
 
-		return NewRpcDBDatabase(addr)
+		return NewRpcDBDatabase(addrs)
 	}
 
 	// No pre-existing database, no user-requested one either. Default to Pebble.
