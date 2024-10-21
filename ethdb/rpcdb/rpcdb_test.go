@@ -3,6 +3,7 @@ package rpcdb_test
 import (
 	"context"
 	"net"
+	"strconv"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -16,36 +17,49 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 )
 
+// create new grpc server, client
+func newConn(t *testing.T) (*grpc.ClientConn, error) {
+	ctx := context.Background()
+	buffer := 101024 * 1024
+	lis := bufconn.Listen(buffer)
+
+	server := grpc.NewServer()
+	h, err := handler.NewKVStoreTest()
+	if err != nil {
+		return nil, err
+	}
+
+	api.RegisterKVServer(server, h)
+	go func() {
+		if err := server.Serve(lis); err != nil {
+			assert.NoError(t, err)
+		}
+	}()
+
+	conn, err := grpc.DialContext(
+		ctx,
+		"",
+		grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) {
+			return lis.Dial()
+		}),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+
+	return conn, err
+}
+
 func TestRPCDatabase(t *testing.T) {
 	t.Run("DatabaseSuite", func(t *testing.T) {
 		dbtest.TestDatabaseSuite(t, func() ethdb.KeyValueStore {
-			ctx := context.Background()
-			buffer := 101024 * 1024
-			lis := bufconn.Listen(buffer)
+			conns := make(map[string]*grpc.ClientConn)
+			for i := range 3 {
+				conn, err := newConn(t)
+				assert.NoError(t, err)
 
-			server := grpc.NewServer()
-			h, err := handler.NewKVStoreTest()
-			assert.NoError(t, err)
+				conns[strconv.Itoa(i)] = conn
+			}
 
-			api.RegisterKVServer(server, h)
-			go func() {
-				if err := server.Serve(lis); err != nil {
-					assert.NoError(t, err)
-				}
-			}()
-
-			// conn, err := grpc.NewClient("localhost:6789", grpc.WithTransportCredentials(insecure.NewCredentials()))
-			conn, err := grpc.DialContext(
-				ctx,
-				"",
-				grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) {
-					return lis.Dial()
-				}),
-				grpc.WithTransportCredentials(insecure.NewCredentials()),
-			)
-			assert.NoError(t, err)
-
-			db := rpcdb.New(conn)
+			db := rpcdb.New(conns)
 
 			return db
 		})
