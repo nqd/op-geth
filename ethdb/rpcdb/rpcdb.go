@@ -2,12 +2,15 @@ package rpcdb
 
 import (
 	"context"
+	"errors"
+	"io"
 	"slices"
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/golang/groupcache/consistenthash"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
@@ -212,53 +215,99 @@ func (b *batch) Write() error {
 }
 
 // NewIterator implements ethdb.KeyValueStore.
+// func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
+// 	i := iterator{
+// 		index: -1,
+// 		kvs:   make([]*keyvalue, 0),
+// 	}
+
+// 	errg, ctx := errgroup.WithContext(ctx)
+
+// 	for _, kvClient := range d.clients {
+// 		errg.Go(func() error {
+// 			res, err := kvClient.NewIterator(ctx, &api.NewIteratorRequest{Prefix: prefix, Start: start})
+// 			if err != nil {
+// 				return err
+// 			}
+// 			iterID := res.GetIteratorId()
+// 			for {
+// 				nextRes, err := kvClient.IteratorNext(ctx, &api.IteratorNextRequest{IteratorId: iterID})
+// 				if err != nil {
+// 					return err
+// 				}
+// 				if !nextRes.GetNext() {
+// 					// close the iterator
+// 					// todo: may need to handle the error
+// 					_, _ = kvClient.IteratorRelease(ctx, &api.IteratorReleaseRequest{IteratorId: iterID})
+
+// 					break
+// 				}
+// 				// todo: could parallelize this part
+// 				keyRes, err := kvClient.IteratorKey(ctx, &api.IteratorKeyRequest{IteratorId: iterID})
+// 				if err != nil {
+// 					return err
+// 				}
+// 				valRes, err := kvClient.IteratorValue(ctx, &api.IteratorValueRequest{IteratorId: iterID})
+// 				if err != nil {
+// 					return err
+// 				}
+// 				i.mu.Lock()
+// 				i.kvs = append(i.kvs, &keyvalue{key: keyRes.GetKey(), value: valRes.GetValue()})
+// 				i.mu.Unlock()
+// 			}
+
+// 			return nil
+// 		})
+// 	}
+
+// 	err := errg.Wait()
+// 	if err != nil {
+// 		i.err = err
+// 		return nil
+// 	}
+
+// 	// sort by the key
+// 	slices.SortFunc(i.kvs, func(a, b *keyvalue) int {
+// 		return slices.Compare(a.key, b.key)
+// 	})
+
+// 	return &i
+// }
+
 func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	i := iterator{
 		index: -1,
-		kvs:   make([]*keyvalue, 0),
+		kvs:   make([]*keyvalue, 0, 500),
 	}
+	var lock sync.Mutex
 
 	errg, ctx := errgroup.WithContext(ctx)
 
 	for _, kvClient := range d.clients {
 		errg.Go(func() error {
-			res, err := kvClient.NewIterator(ctx, &api.NewIteratorRequest{Prefix: prefix, Start: start})
+			stream, err := kvClient.NewIteratorStream(ctx, &api.NewIteratorStreamRequest{Prefix: prefix, Start: start})
 			if err != nil {
 				return err
 			}
-			iterID := res.GetIteratorId()
-			for {
-				nextRes, err := kvClient.IteratorNext(ctx, &api.IteratorNextRequest{IteratorId: iterID})
-				if err != nil {
-					return err
-				}
-				if !nextRes.GetNext() {
-					// close the iterator
-					// todo: may need to handle the error
-					_, _ = kvClient.IteratorRelease(ctx, &api.IteratorReleaseRequest{IteratorId: iterID})
 
+			for {
+				res, err := stream.Recv()
+				if errors.Is(err, io.EOF) {
 					break
 				}
-				// todo: could parallelize this part
-				keyRes, err := kvClient.IteratorKey(ctx, &api.IteratorKeyRequest{IteratorId: iterID})
 				if err != nil {
 					return err
 				}
-				valRes, err := kvClient.IteratorValue(ctx, &api.IteratorValueRequest{IteratorId: iterID})
-				if err != nil {
-					return err
-				}
-				i.mu.Lock()
-				i.kvs = append(i.kvs, &keyvalue{key: keyRes.GetKey(), value: valRes.GetValue()})
-				i.mu.Unlock()
+				lock.Lock()
+				i.kvs = append(i.kvs, &keyvalue{key: res.GetKey(), value: res.GetValue()})
+				lock.Unlock()
 			}
 
 			return nil
 		})
 	}
 
-	err := errg.Wait()
-	if err != nil {
+	if err := errg.Wait(); err != nil {
 		i.err = err
 		return nil
 	}
@@ -267,6 +316,8 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	slices.SortFunc(i.kvs, func(a, b *keyvalue) int {
 		return slices.Compare(a.key, b.key)
 	})
+
+	i.size = len(i.kvs)
 
 	return &i
 }
@@ -281,6 +332,7 @@ type iterator struct {
 	index int
 	kvs   []*keyvalue
 	err   error
+	size  int
 }
 
 var _ ethdb.Iterator = (*iterator)(nil)
@@ -310,6 +362,9 @@ func (i *iterator) Next() bool {
 
 // Release implements ethdb.Iterator.
 func (i *iterator) Release() {
+	// for debug
+	log.Info("=== release iterator ===", "size", i.size, "index", i.index)
+
 	i.index = -1
 	i.kvs = nil
 	i.err = nil

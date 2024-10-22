@@ -142,3 +142,23 @@ func (s *kvStore) Close(_ context.Context, req *api.CloseRequest) (*api.CloseRes
 
 	return &api.CloseResponse{}, nil
 }
+
+func (s *kvStore) NewIteratorStream(req *api.NewIteratorStreamRequest, stream api.KV_NewIteratorStreamServer) error {
+	it := s.pebbleDB.NewIterator(req.GetPrefix(), req.GetStart())
+	defer it.Release()
+
+	for {
+		if !it.Next() {
+			break
+		}
+
+		if err := stream.Send(&api.NewIteratorStreamResponse{
+			Key:   it.Key(),
+			Value: it.Value(),
+		}); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

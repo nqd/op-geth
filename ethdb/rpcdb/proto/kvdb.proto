@@ -8,19 +8,22 @@ service KV {
   rpc Get(GetRequest) returns (GetResponse) {}
   rpc Has(HasRequest) returns (HasResponse) {}
   rpc Batch(BatchRequest) returns (BatchResponse) {}
-  rpc NewIterator(NewIteratorRequest) returns (NewIteratorResponse) {}
   rpc Compact(CompactRequest) returns (CompactResponse) {}
   rpc Delete(DeleteRequest) returns (DeleteResponse) {}
   rpc Put(PutRequest) returns (PutResponse) {}
   rpc Reset(ResetRequest) returns (ResetResponse) {}
   rpc Close(CloseRequest) returns (CloseResponse) {}
 
+  rpc NewIterator(NewIteratorRequest) returns (NewIteratorResponse) {}
   rpc IteratorError(IteratorErrorRequest) returns (IteratorErrorResponse) {}
   rpc IteratorKey(IteratorKeyRequest) returns (IteratorKeyResponse) {}
   rpc IteratorNext(IteratorNextRequest) returns (IteratorNextResponse) {}
   rpc IteratorRelease(IteratorReleaseRequest) returns 
     (IteratorReleaseResponse) {}
   rpc IteratorValue(IteratorValueRequest) returns (IteratorValueResponse) {}
+
+  rpc NewIteratorStream(NewIteratorStreamRequest) returns
+    (stream NewIteratorStreamResponse) {}
 }
 
 message GetRequest {
@@ -135,4 +138,14 @@ message CloseRequest {
 }
 
 message CloseResponse {
+}
+
+message NewIteratorStreamRequest {
+  bytes prefix = 1;
+  bytes start = 2;
+}
+
+message NewIteratorStreamResponse {
+  bytes key = 1;
+  bytes value = 2;
 }
