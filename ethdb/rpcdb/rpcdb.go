@@ -328,7 +328,6 @@ type keyvalue struct {
 }
 
 type iterator struct {
-	mu    sync.Mutex
 	index int
 	kvs   []*keyvalue
 	err   error
@@ -366,7 +365,7 @@ func (i *iterator) Release() {
 	log.Info("=== release iterator ===", "size", i.size, "index", i.index)
 
 	i.index = -1
-	i.kvs = nil
+	i.kvs = i.kvs[:0]
 	i.err = nil
 }
 
