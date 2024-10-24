@@ -328,6 +328,7 @@ type keyvalue struct {
 }
 
 type iterator struct {
+	mu    sync.RWMutex
 	index int
 	kvs   []*keyvalue
 	err   error
@@ -343,6 +344,9 @@ func (i *iterator) Error() error {
 
 // Key implements ethdb.Iterator.
 func (i *iterator) Key() []byte {
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+
 	if i.index < 0 || i.index >= len(i.kvs) {
 		return nil
 	}
@@ -351,6 +355,9 @@ func (i *iterator) Key() []byte {
 
 // Next implements ethdb.Iterator.
 func (i *iterator) Next() bool {
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+
 	if i.index >= len(i.kvs) {
 		return false
 	}
@@ -364,6 +371,9 @@ func (i *iterator) Release() {
 	// for debug
 	log.Info("=== release iterator ===", "size", i.size, "index", i.index)
 
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
 	i.index = -1
 	i.kvs = i.kvs[:0]
 	i.err = nil
@@ -371,6 +381,9 @@ func (i *iterator) Release() {
 
 // Value implements ethdb.Iterator.
 func (i *iterator) Value() []byte {
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+
 	if i.index < 0 || i.index >= len(i.kvs) {
 		return nil
 	}
