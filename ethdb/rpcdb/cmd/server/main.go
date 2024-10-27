@@ -34,13 +34,15 @@ func main() {
 		grpc.MaxRecvMsgSize(maxMsgSize),
 		grpc.MaxSendMsgSize(maxMsgSize),
 		grpc.UnaryInterceptor(grpc_prometheus.UnaryServerInterceptor),
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	)
 
 	api.RegisterKVServer(server, h)
 
 	// Enable gRPC Prometheus monitoring
 	grpc_prometheus.Register(server)
-	startPrometheus()
+	grpc_prometheus.EnableHandlingTimeHistogram()
+	go startPrometheus()
 
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -73,12 +75,12 @@ func newPebble() (*pebble.Database, error) {
 func startPrometheus() {
 	// Start Prometheus metrics server
 	http.Handle("/metrics", promhttp.Handler())
-	go func() {
-		log.Printf("Starting metrics server at address: %s\n", prometheusAddr)
-		log.Printf("\tprometheus metrics available at %s/metrics\n", prometheusAddr)
-		log.Printf("\tpprof available at %s/debug/pprof/\n", prometheusAddr)
-		if err := http.ListenAndServe(prometheusAddr, nil); err != nil {
-			log.Panic("Failed to start Prometheus metrics server", "err", err)
-		}
-	}()
+
+	log.Printf("Starting metrics server at address: %s\n", prometheusAddr)
+	log.Printf("\tprometheus metrics available at %s/metrics\n", prometheusAddr)
+	log.Printf("\tpprof available at %s/debug/pprof/\n", prometheusAddr)
+
+	if err := http.ListenAndServe(prometheusAddr, nil); err != nil {
+		log.Panic("Failed to start Prometheus metrics server", "err", err)
+	}
 }

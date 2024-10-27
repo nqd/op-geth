@@ -309,7 +309,7 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 
 	if err := errg.Wait(); err != nil {
 		i.err = err
-		return nil
+		return &i
 	}
 
 	// sort by the key
@@ -328,11 +328,11 @@ type keyvalue struct {
 }
 
 type iterator struct {
-	mu    sync.Mutex
-	index int
-	kvs   []*keyvalue
-	err   error
-	size  int
+	index    int
+	kvs      []*keyvalue
+	err      error
+	size     int
+	released bool
 }
 
 var _ ethdb.Iterator = (*iterator)(nil)
@@ -362,12 +362,16 @@ func (i *iterator) Next() bool {
 
 // Release implements ethdb.Iterator.
 func (i *iterator) Release() {
+	if i.released {
+		return
+	}
 	// for debug
 	log.Info("=== release iterator ===", "size", i.size, "index", i.index)
 
 	i.index = -1
-	i.kvs = nil
+	i.kvs = i.kvs[:0]
 	i.err = nil
+	i.released = true
 }
 
 // Value implements ethdb.Iterator.
