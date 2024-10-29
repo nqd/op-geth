@@ -3,6 +3,7 @@ package aipdb
 import (
 	"slices"
 
+	cockroachpebble "github.com/cockroachdb/pebble"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/ethdb/pebble"
 	"github.com/golang/groupcache/consistenthash"
@@ -179,36 +180,59 @@ func (b *batch) Write() error {
 	return nil
 }
 
-type iterKey struct {
-	it  ethdb.Iterator
-	key []byte
+type pebbleIterator struct {
+	iter *cockroachpebble.Iterator
+	key  []byte
 }
 type iterator struct {
-	d *Database
-	// iterMap         map[string]ethdb.Iterator // peer -> iterator
-	iterKeys []*iterKey
-	// currIter ethdb.Iterator // current iterator
+	d           *Database
+	pebbleIters []*pebbleIterator
+	moved       bool
+	released    bool
 }
 
 var _ ethdb.Iterator = (*iterator)(nil)
 
+// copied from pebble/pebble.go
+func upperBound(prefix []byte) (limit []byte) {
+	for i := len(prefix) - 1; i >= 0; i-- {
+		c := prefix[i]
+		if c == 0xff {
+			continue
+		}
+		limit = make([]byte, i+1)
+		copy(limit, prefix)
+		limit[i] = c + 1
+		break
+	}
+	return limit
+}
+
 // NewIterator implements ethdb.KeyValueStore.
 func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	i := &iterator{
-		d: d,
-		// iterMap:         make(map[string]ethdb.Iterator, len(d.pebbleMap)),
-		// lookaheadKeyMap: make(map[ethdb.Iterator][]byte, len(d.pebbleMap)),
-		iterKeys: make([]*iterKey, 0, len(d.pebbleMap)),
+		d:           d,
+		pebbleIters: make([]*pebbleIterator, 0, len(d.pebbleMap)),
+		moved:       true,
+		released:    false,
 	}
 
-	for peer, _ := range d.pebbleMap {
-		it := d.pebbleMap[peer].NewIterator(prefix, start)
-		if it.Next() {
-			i.iterKeys = append(i.iterKeys, &iterKey{it: it, key: it.Key()})
+	for _, pdb := range d.pebbleMap {
+		iter, _ := pdb.GetDB().NewIter(&cockroachpebble.IterOptions{
+			LowerBound: append(prefix, start...),
+			UpperBound: upperBound(prefix),
+		})
+		iter.First()
+
+		if iter.Valid() {
+			i.pebbleIters = append(i.pebbleIters, &pebbleIterator{
+				iter: iter,
+				key:  iter.Key(),
+			})
 		}
 	}
 
-	slices.SortStableFunc(i.iterKeys, func(a, b *iterKey) int {
+	slices.SortStableFunc(i.pebbleIters, func(a, b *pebbleIterator) int {
 		return slices.Compare(a.key, b.key)
 	})
 
@@ -217,35 +241,40 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 
 // Error implements ethdb.Iterator.
 func (i *iterator) Error() error {
-	if len(i.iterKeys) == 0 {
+	if len(i.pebbleIters) == 0 {
 		return nil
 	}
 
-	return i.iterKeys[0].it.Error()
+	return i.pebbleIters[0].iter.Error()
 }
 
 // Next implements ethdb.Iterator.
 func (i *iterator) Next() bool {
-	currIter := i.iterKeys[0].it
+	if len(i.pebbleIters) == 0 {
+		return false
+	}
 
-	if !currIter.Next() {
-		if len(i.iterKeys) == 1 {
-			return false
-		}
-
-		// remove the iterator that has reached the end
-		currIter.Release()
-
-		// the next iterator will be the first one, with the key preloaded
-		i.iterKeys = i.iterKeys[1:]
+	if i.moved {
+		i.moved = false
 
 		return true
 	}
 
+	currIter := i.pebbleIters[0].iter
+
+	if !currIter.Next() {
+		currIter.Close()
+
+		// the next iterator will be the first one, with the key preloaded
+		i.pebbleIters = i.pebbleIters[1:]
+
+		return len(i.pebbleIters) != 0
+	}
+
 	// update the key
-	i.iterKeys[0].key = currIter.Key()
+	i.pebbleIters[0].key = currIter.Key()
 	// sort the keys again
-	slices.SortStableFunc(i.iterKeys, func(a, b *iterKey) int {
+	slices.SortStableFunc(i.pebbleIters, func(a, b *pebbleIterator) int {
 		return slices.Compare(a.key, b.key)
 	})
 
@@ -254,18 +283,22 @@ func (i *iterator) Next() bool {
 
 // Key implements ethdb.Iterator.
 func (i *iterator) Key() []byte {
-	return i.iterKeys[0].key
+	return i.pebbleIters[0].key
 }
 
 // Value implements ethdb.Iterator.
 func (i *iterator) Value() []byte {
-	return i.iterKeys[0].it.Value()
+	return i.pebbleIters[0].iter.Value()
 }
 
 // Release implements ethdb.Iterator.
 func (i *iterator) Release() {
-	for _, iterKey := range i.iterKeys {
-		iterKey.it.Release()
+	if i.released {
+		return
+	}
+
+	for _, iterKey := range i.pebbleIters {
+		iterKey.iter.Close()
 	}
 }
 
