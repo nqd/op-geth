@@ -17,6 +17,7 @@
 package pebble
 
 import (
+	"os"
 	"testing"
 
 	"github.com/cockroachdb/pebble"
@@ -52,5 +53,21 @@ func BenchmarkPebbleDB(b *testing.B) {
 		return &Database{
 			db: db,
 		}
+	})
+}
+
+func BenchmarkPebbleDBOnDisk(b *testing.B) {
+	dbtest.BenchDatabaseSuite(b, func() ethdb.KeyValueStore {
+		tmdir := os.TempDir()
+		cache := 1000000
+		handle := 100
+		namespace := "rpcdb"
+		readonly := false
+		ephemeral := false
+		pdb, err := New(tmdir, cache, handle, namespace, readonly, ephemeral)
+		if err != nil {
+			b.Fatal(err)
+		}
+		return pdb
 	})
 }

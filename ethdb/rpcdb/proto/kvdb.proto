@@ -24,6 +24,9 @@ service KV {
 
   rpc NewIteratorStream(NewIteratorStreamRequest) returns
     (stream NewIteratorStreamResponse) {}
+
+  rpc NewIteratorStreams(stream NewIteratorStreamRequest) returns
+    (stream NewIteratorStreamResponse) {}
 }
 
 message GetRequest {

@@ -19,21 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	KV_Get_FullMethodName               = "/ethereum.rpcdb.api.v1.KV/Get"
-	KV_Has_FullMethodName               = "/ethereum.rpcdb.api.v1.KV/Has"
-	KV_Batch_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Batch"
-	KV_Compact_FullMethodName           = "/ethereum.rpcdb.api.v1.KV/Compact"
-	KV_Delete_FullMethodName            = "/ethereum.rpcdb.api.v1.KV/Delete"
-	KV_Put_FullMethodName               = "/ethereum.rpcdb.api.v1.KV/Put"
-	KV_Reset_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Reset"
-	KV_Close_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Close"
-	KV_NewIterator_FullMethodName       = "/ethereum.rpcdb.api.v1.KV/NewIterator"
-	KV_IteratorError_FullMethodName     = "/ethereum.rpcdb.api.v1.KV/IteratorError"
-	KV_IteratorKey_FullMethodName       = "/ethereum.rpcdb.api.v1.KV/IteratorKey"
-	KV_IteratorNext_FullMethodName      = "/ethereum.rpcdb.api.v1.KV/IteratorNext"
-	KV_IteratorRelease_FullMethodName   = "/ethereum.rpcdb.api.v1.KV/IteratorRelease"
-	KV_IteratorValue_FullMethodName     = "/ethereum.rpcdb.api.v1.KV/IteratorValue"
-	KV_NewIteratorStream_FullMethodName = "/ethereum.rpcdb.api.v1.KV/NewIteratorStream"
+	KV_Get_FullMethodName                = "/ethereum.rpcdb.api.v1.KV/Get"
+	KV_Has_FullMethodName                = "/ethereum.rpcdb.api.v1.KV/Has"
+	KV_Batch_FullMethodName              = "/ethereum.rpcdb.api.v1.KV/Batch"
+	KV_Compact_FullMethodName            = "/ethereum.rpcdb.api.v1.KV/Compact"
+	KV_Delete_FullMethodName             = "/ethereum.rpcdb.api.v1.KV/Delete"
+	KV_Put_FullMethodName                = "/ethereum.rpcdb.api.v1.KV/Put"
+	KV_Reset_FullMethodName              = "/ethereum.rpcdb.api.v1.KV/Reset"
+	KV_Close_FullMethodName              = "/ethereum.rpcdb.api.v1.KV/Close"
+	KV_NewIterator_FullMethodName        = "/ethereum.rpcdb.api.v1.KV/NewIterator"
+	KV_IteratorError_FullMethodName      = "/ethereum.rpcdb.api.v1.KV/IteratorError"
+	KV_IteratorKey_FullMethodName        = "/ethereum.rpcdb.api.v1.KV/IteratorKey"
+	KV_IteratorNext_FullMethodName       = "/ethereum.rpcdb.api.v1.KV/IteratorNext"
+	KV_IteratorRelease_FullMethodName    = "/ethereum.rpcdb.api.v1.KV/IteratorRelease"
+	KV_IteratorValue_FullMethodName      = "/ethereum.rpcdb.api.v1.KV/IteratorValue"
+	KV_NewIteratorStream_FullMethodName  = "/ethereum.rpcdb.api.v1.KV/NewIteratorStream"
+	KV_NewIteratorStreams_FullMethodName = "/ethereum.rpcdb.api.v1.KV/NewIteratorStreams"
 )
 
 // KVClient is the client API for KV service.
@@ -55,6 +56,7 @@ type KVClient interface {
 	IteratorRelease(ctx context.Context, in *IteratorReleaseRequest, opts ...grpc.CallOption) (*IteratorReleaseResponse, error)
 	IteratorValue(ctx context.Context, in *IteratorValueRequest, opts ...grpc.CallOption) (*IteratorValueResponse, error)
 	NewIteratorStream(ctx context.Context, in *NewIteratorStreamRequest, opts ...grpc.CallOption) (KV_NewIteratorStreamClient, error)
+	NewIteratorStreams(ctx context.Context, opts ...grpc.CallOption) (KV_NewIteratorStreamsClient, error)
 }
 
 type kVClient struct {
@@ -223,6 +225,37 @@ func (x *kVNewIteratorStreamClient) Recv() (*NewIteratorStreamResponse, error) {
 	return m, nil
 }
 
+func (c *kVClient) NewIteratorStreams(ctx context.Context, opts ...grpc.CallOption) (KV_NewIteratorStreamsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &KV_ServiceDesc.Streams[1], KV_NewIteratorStreams_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &kVNewIteratorStreamsClient{stream}
+	return x, nil
+}
+
+type KV_NewIteratorStreamsClient interface {
+	Send(*NewIteratorStreamRequest) error
+	Recv() (*NewIteratorStreamResponse, error)
+	grpc.ClientStream
+}
+
+type kVNewIteratorStreamsClient struct {
+	grpc.ClientStream
+}
+
+func (x *kVNewIteratorStreamsClient) Send(m *NewIteratorStreamRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *kVNewIteratorStreamsClient) Recv() (*NewIteratorStreamResponse, error) {
+	m := new(NewIteratorStreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // KVServer is the server API for KV service.
 // All implementations must embed UnimplementedKVServer
 // for forward compatibility
@@ -242,6 +275,7 @@ type KVServer interface {
 	IteratorRelease(context.Context, *IteratorReleaseRequest) (*IteratorReleaseResponse, error)
 	IteratorValue(context.Context, *IteratorValueRequest) (*IteratorValueResponse, error)
 	NewIteratorStream(*NewIteratorStreamRequest, KV_NewIteratorStreamServer) error
+	NewIteratorStreams(KV_NewIteratorStreamsServer) error
 	mustEmbedUnimplementedKVServer()
 }
 
@@ -293,6 +327,9 @@ func (UnimplementedKVServer) IteratorValue(context.Context, *IteratorValueReques
 }
 func (UnimplementedKVServer) NewIteratorStream(*NewIteratorStreamRequest, KV_NewIteratorStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method NewIteratorStream not implemented")
+}
+func (UnimplementedKVServer) NewIteratorStreams(KV_NewIteratorStreamsServer) error {
+	return status.Errorf(codes.Unimplemented, "method NewIteratorStreams not implemented")
 }
 func (UnimplementedKVServer) mustEmbedUnimplementedKVServer() {}
 
@@ -580,6 +617,32 @@ func (x *kVNewIteratorStreamServer) Send(m *NewIteratorStreamResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _KV_NewIteratorStreams_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(KVServer).NewIteratorStreams(&kVNewIteratorStreamsServer{stream})
+}
+
+type KV_NewIteratorStreamsServer interface {
+	Send(*NewIteratorStreamResponse) error
+	Recv() (*NewIteratorStreamRequest, error)
+	grpc.ServerStream
+}
+
+type kVNewIteratorStreamsServer struct {
+	grpc.ServerStream
+}
+
+func (x *kVNewIteratorStreamsServer) Send(m *NewIteratorStreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *kVNewIteratorStreamsServer) Recv() (*NewIteratorStreamRequest, error) {
+	m := new(NewIteratorStreamRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // KV_ServiceDesc is the grpc.ServiceDesc for KV service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -649,6 +712,12 @@ var KV_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "NewIteratorStream",
 			Handler:       _KV_NewIteratorStream_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "NewIteratorStreams",
+			Handler:       _KV_NewIteratorStreams_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "kvdb.proto",

@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 
+	cockroachpebble "github.com/cockroachdb/pebble"
+	"github.com/cockroachdb/pebble/vfs"
 	"github.com/ethereum/go-ethereum/ethdb/pebble"
 	api "github.com/ethereum/go-ethereum/ethdb/rpcdb/gen/go/api/v1"
 	"github.com/ethereum/go-ethereum/ethdb/rpcdb/handler"
@@ -23,9 +25,25 @@ const (
 )
 
 func main() {
-	p, err := newPebble()
-	if err != nil {
-		log.Panic("Failed to create pebble database", "err", err)
+	useMemFS := os.Getenv("USE_MEM_FS") == "true"
+	var p *pebble.Database
+	var err error
+
+	if useMemFS {
+		log.Printf("Using in-memory filesystem\n")
+
+		db, err := cockroachpebble.Open("", &cockroachpebble.Options{
+			FS: vfs.NewMem(),
+		})
+		if err != nil {
+			log.Panic("Failed to create pebble database", "err", err)
+		}
+		p = pebble.NewRaw(db)
+	} else {
+		p, err = newPebble()
+		if err != nil {
+			log.Panic("Failed to create pebble database", "err", err)
+		}
 	}
 
 	h := handler.NewKVStoreWithPebble(p)
