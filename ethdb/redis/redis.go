@@ -87,6 +87,9 @@ func New(client *redis.ClusterClient, namespace string) *Database {
 
 var _ ethdb.KeyValueStore = (*Database)(nil)
 
+const zset = "gethdb"
+const zscore = 0 // all keys have the same score
+
 // Close implements ethdb.KeyValueStore.
 func (d *Database) Close() error {
 	return d.client.Close()
@@ -104,6 +107,10 @@ func (d *Database) Delete(key []byte) error {
 
 	ctx := context.Background()
 	delCmd := d.client.Del(ctx, string(key))
+
+	// todo: use lua to ensure atomicity
+	// ignore error for now
+	d.client.ZRem(ctx, zset, string(key))
 
 	return delCmd.Err()
 }
@@ -165,6 +172,21 @@ func (d *Database) NewBatchWithSize(size int) ethdb.Batch {
 	}
 }
 
+// upperBound returns the upper bound for the given prefix
+func upperBound(prefix []byte) (limit []byte) {
+	for i := len(prefix) - 1; i >= 0; i-- {
+		c := prefix[i]
+		if c == 0xff {
+			continue
+		}
+		limit = make([]byte, i+1)
+		copy(limit, prefix)
+		limit[i] = c + 1
+		break
+	}
+	return limit
+}
+
 // NewIterator implements ethdb.KeyValueStore.
 func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	t1 := time.Now()
@@ -179,33 +201,37 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	d.iteratorCount.Add(1)
 
 	ctx := context.Background()
-	size := 100
-	pr := string(prefix)
-	st := string(append(prefix, start...))
+	size := 128
+	lowerBound := string(append(prefix, start...))
+	upperBound := string(upperBound(prefix))
 
 	// get all kv at one then sort the result
 	// though this is not efficient, but this is the only way to implement sorted iterator in redis
 	// for each master function run in parallel
 	iter := iterator{
+		db:    d,
 		index: -1,
-		kvs:   make([]keyvalue, 0, size),
+		keys:  make([]string, 0, size),
 	}
-	var kvsLock sync.Mutex
-	err := d.client.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
-		rit := client.Scan(ctx, 0, pr+"*", 0).Iterator()
 
-		for rit.Next(ctx) {
-			k := rit.Val()
-			if k >= st {
-				kvsLock.Lock()
-				iter.kvs = append(iter.kvs, keyvalue{
-					key:   k,
-					value: nil,
-				})
-				kvsLock.Unlock()
-			}
+	var keysLock sync.Mutex
+
+	err := d.client.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
+		ssCmd := client.ZRangeByLex(ctx, zset, &redis.ZRangeBy{
+			Min:    lowerBound,
+			Max:    upperBound,
+			Offset: 0,
+			Count:  0,
+		})
+		if err := ssCmd.Err(); err != nil {
+			return err
 		}
-		return rit.Err()
+
+		keysLock.Lock()
+		iter.keys = append(iter.keys, ssCmd.Val()...)
+		keysLock.Unlock()
+
+		return nil
 	})
 
 	if err != nil {
@@ -213,39 +239,9 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	}
 
 	// sort by the key
-	slices.SortFunc(iter.kvs, func(a, b keyvalue) int {
-		return strings.Compare(a.key, b.key)
+	slices.SortFunc(iter.keys, func(a, b string) int {
+		return strings.Compare(a, b)
 	})
-
-	log.Info("NewIterator get key", "rawSize", len(iter.kvs), "durationInSec", time.Since(t1).Seconds())
-
-	// query values via pipeline
-	cmds, err := d.client.Pipelined(ctx, func(pipe redis.Pipeliner) error {
-		for i := range iter.kvs {
-			cmd := pipe.Get(ctx, iter.kvs[i].key)
-			if cmd.Err() != nil {
-				return cmd.Err()
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		iter.err = err
-	}
-
-	for i, cmd := range cmds {
-		if cmd.Err() != nil {
-			iter.err = cmd.Err()
-			break
-		}
-		val, err := cmd.(*redis.StringCmd).Bytes()
-		if err != nil {
-			iter.err = err
-			break
-		}
-
-		iter.kvs[i].value = val
-	}
 
 	return &iter
 }
@@ -256,6 +252,10 @@ func (d *Database) Put(key []byte, value []byte) error {
 
 	ctx := context.Background()
 	setCmd := d.client.Set(ctx, string(key), value, 0)
+
+	// todo: use lua to ensure atomicity
+	// also ignore error for now
+	d.client.ZAdd(ctx, zset, redis.Z{Score: zscore, Member: string(key)})
 
 	return setCmd.Err()
 }

@@ -84,10 +84,17 @@ func (b *batch) Write() error {
 	_, err := b.db.client.Pipelined(ctx, func(pipe redis.Pipeliner) error {
 		var err error
 		for _, kv := range b.writes {
+			// todo: could combine keys to reduce number of commands
 			if kv.delete {
 				err = pipe.Del(ctx, kv.key).Err()
+				// todo: use luascript to ensure atomicity
+				// ignore error for now
+				pipe.ZRem(ctx, zset, kv.key)
 			} else {
 				err = pipe.Set(ctx, kv.key, kv.value, 0).Err()
+				// todo: use luascript to ensure atomicity
+				// ignore error for now
+				pipe.ZAdd(ctx, zset, redis.Z{Member: kv.key})
 			}
 			if err != nil {
 				return err
