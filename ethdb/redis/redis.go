@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 	"sync"
@@ -174,17 +175,9 @@ func (d *Database) NewBatchWithSize(size int) ethdb.Batch {
 
 // upperBound returns the upper bound for the given prefix
 func upperBound(prefix []byte) (limit []byte) {
-	for i := len(prefix) - 1; i >= 0; i-- {
-		c := prefix[i]
-		if c == 0xff {
-			continue
-		}
-		limit = make([]byte, i+1)
-		copy(limit, prefix)
-		limit[i] = c + 1
-		break
-	}
-	return limit
+	ub := make([]byte, len(prefix), len(prefix)+1)
+	copy(ub, prefix)
+	return append(ub, 0xff)
 }
 
 // NewIterator implements ethdb.KeyValueStore.
@@ -202,8 +195,10 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 
 	ctx := context.Background()
 	size := 128
-	lowerBound := string(append(prefix, start...))
-	upperBound := string(upperBound(prefix))
+	lowerBoundBytes := (append(prefix, start...))
+	upperBoundBytes := (upperBound(prefix))
+	lowerBound := string(append([]byte("["), lowerBoundBytes...))
+	upperBound := string(append([]byte("["), upperBoundBytes...))
 
 	// get all kv at one then sort the result
 	// though this is not efficient, but this is the only way to implement sorted iterator in redis
@@ -224,6 +219,10 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 			Count:  0,
 		})
 		if err := ssCmd.Err(); err != nil {
+			// test
+			if strings.Contains(err.Error(), "MOVED") {
+				return nil
+			}
 			return err
 		}
 
@@ -235,6 +234,7 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 	})
 
 	if err != nil {
+		fmt.Printf("=== NewIterator error: %v\n", err)
 		iter.err = err
 	}
 

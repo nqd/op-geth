@@ -1,6 +1,10 @@
 package redis
 
-import "github.com/ethereum/go-ethereum/ethdb"
+import (
+	"fmt"
+
+	"github.com/ethereum/go-ethereum/ethdb"
+)
 
 type iterator struct {
 	db    *Database
@@ -45,7 +49,11 @@ func (i *iterator) Value() []byte {
 		return nil
 	}
 
-	i.db.get([]byte(i.keys[i.index]))
+	val, err := i.db.get([]byte(i.keys[i.index]))
+	// todo: handle error
+	fmt.Printf("=== db get error: %v", err)
+
+	return val
 }
 
 var _ ethdb.Iterator = (*iterator)(nil)
