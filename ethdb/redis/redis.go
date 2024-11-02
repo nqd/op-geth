@@ -13,7 +13,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/metrics"
+	"github.com/golang/groupcache/consistenthash"
 	"github.com/redis/go-redis/v9"
+	"golang.org/x/sync/errgroup"
 )
 
 type Database struct {
@@ -51,6 +53,9 @@ type Database struct {
 
 	batchWithSizeCount atomic.Int64 // Total number of new batch with size operations
 	iteratorCount      atomic.Int64 // Total number of new iterator operations
+
+	conHash      *consistenthash.Map
+	conHashPeers []string
 }
 
 const (
@@ -83,13 +88,22 @@ func New(client *redis.ClusterClient, namespace string) *Database {
 
 	go db.meter(metricsGatheringInterval)
 
+	chPeerCount := 16
+	conHashPeers := make([]string, 0, chPeerCount)
+	conHash := consistenthash.New(chPeerCount, nil)
+	for i := range chPeerCount {
+		peer := fmt.Sprintf("peer-%d", i)
+		conHashPeers = append(conHashPeers, peer)
+		conHash.Add(peer)
+	}
+
+	db.conHash = conHash
+	db.conHashPeers = conHashPeers
+
 	return db
 }
 
 var _ ethdb.KeyValueStore = (*Database)(nil)
-
-const zset = "gethdb"
-const zscore = 0 // all keys have the same score
 
 // Close implements ethdb.KeyValueStore.
 func (d *Database) Close() error {
@@ -104,14 +118,17 @@ func (d *Database) Compact(start []byte, limit []byte) error {
 
 // Delete implements ethdb.KeyValueStore.
 func (d *Database) Delete(key []byte) error {
+	keyStr := string(key)
+
 	d.deleteCount.Add(1)
 
 	ctx := context.Background()
-	delCmd := d.client.Del(ctx, string(key))
+	delCmd := d.client.Del(ctx, keyStr)
 
 	// todo: use lua to ensure atomicity
 	// ignore error for now
-	d.client.ZRem(ctx, zset, string(key))
+	ordSetKey := d.conHash.Get(keyStr)
+	d.client.ZRem(ctx, ordSetKey, keyStr)
 
 	return delCmd.Err()
 }
@@ -157,20 +174,14 @@ func (d *Database) Has(key []byte) (bool, error) {
 func (d *Database) NewBatch() ethdb.Batch {
 	d.batchCount.Add(1)
 
-	return &batch{
-		db:     d,
-		writes: make([]keyvalue, 0),
-	}
+	return newBatch(d, 0)
 }
 
 // NewBatchWithSize implements ethdb.KeyValueStore.
 func (d *Database) NewBatchWithSize(size int) ethdb.Batch {
 	d.batchWithSizeCount.Add(1)
 
-	return &batch{
-		db:     d,
-		writes: make([]keyvalue, 0, size),
-	}
+	return newBatch(d, size)
 }
 
 // upperBound returns the upper bound for the given prefix
@@ -211,31 +222,31 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 
 	var keysLock sync.Mutex
 
-	err := d.client.ForEachMaster(ctx, func(ctx context.Context, client *redis.Client) error {
-		ssCmd := client.ZRangeByLex(ctx, zset, &redis.ZRangeBy{
-			Min:    lowerBound,
-			Max:    upperBound,
-			Offset: 0,
-			Count:  0,
-		})
-		if err := ssCmd.Err(); err != nil {
-			// test
-			if strings.Contains(err.Error(), "MOVED") {
-				return nil
+	errg, ctx := errgroup.WithContext(ctx)
+
+	for _, peer := range d.conHashPeers {
+		errg.Go(func() error {
+			ssCmd := d.client.ZRangeByLex(ctx, peer, &redis.ZRangeBy{
+				Min:    lowerBound,
+				Max:    upperBound,
+				Offset: 0,
+				Count:  0,
+			})
+			if err := ssCmd.Err(); err != nil {
+				return err
 			}
-			return err
-		}
 
-		keysLock.Lock()
-		iter.keys = append(iter.keys, ssCmd.Val()...)
-		keysLock.Unlock()
+			keysLock.Lock()
+			iter.keys = append(iter.keys, ssCmd.Val()...)
+			keysLock.Unlock()
 
-		return nil
-	})
+			return nil
+		})
+	}
 
-	if err != nil {
-		fmt.Printf("=== NewIterator error: %v\n", err)
+	if err := errg.Wait(); err != nil {
 		iter.err = err
+		return &iter
 	}
 
 	// sort by the key
@@ -255,7 +266,8 @@ func (d *Database) Put(key []byte, value []byte) error {
 
 	// todo: use lua to ensure atomicity
 	// also ignore error for now
-	d.client.ZAdd(ctx, zset, redis.Z{Score: zscore, Member: string(key)})
+	ordSetKey := d.conHash.Get(string(key))
+	d.client.ZAdd(ctx, ordSetKey, redis.Z{Member: string(key)})
 
 	return setCmd.Err()
 }

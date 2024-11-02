@@ -20,6 +20,14 @@ type batch struct {
 	size   int
 }
 
+func newBatch(db *Database, size int) *batch {
+	return &batch{
+		db:     db,
+		writes: make([]keyvalue, 0, size),
+		size:   0,
+	}
+}
+
 // Delete implements ethdb.Batch.
 func (b *batch) Delete(key []byte) error {
 	b.db.batchDelete.Add(1)
@@ -85,21 +93,23 @@ func (b *batch) Write() error {
 		var err error
 		for _, kv := range b.writes {
 			// todo: could combine keys to reduce number of commands
+			k := b.db.conHash.Get(kv.key)
+
 			if kv.delete {
 				err = pipe.Del(ctx, kv.key).Err()
-				// todo: use luascript to ensure atomicity
 				// ignore error for now
-				pipe.ZRem(ctx, zset, kv.key)
+				pipe.ZRem(ctx, k, kv.key)
 			} else {
 				err = pipe.Set(ctx, kv.key, kv.value, 0).Err()
-				// todo: use luascript to ensure atomicity
 				// ignore error for now
-				pipe.ZAdd(ctx, zset, redis.Z{Member: kv.key})
+
+				pipe.ZAdd(ctx, k, redis.Z{Member: kv.key})
 			}
 			if err != nil {
 				return err
 			}
 		}
+
 		return nil
 	})
 
