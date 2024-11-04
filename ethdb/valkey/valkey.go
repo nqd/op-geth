@@ -247,7 +247,13 @@ func (d *Database) NewIterator(prefix []byte, start []byte) ethdb.Iterator {
 			}
 
 			keysLock.Lock()
-			iter.keys = append(iter.keys, ssCmd.Val()...)
+			result, err := ssCmd.AsStrSlice()
+			if err != nil {
+				keysLock.Unlock()
+				return err
+			}
+
+			iter.keys = append(iter.keys, result...)
 			keysLock.Unlock()
 
 			return nil
